@@ -1,0 +1,51 @@
+global:
+    project_path: 'D:\project\WSF_CG01'
+    asset_work_path: '{project_path}/Assets/{type}/{asset_name}/{step}/work/{file_name}'
+    asset_approve_path: '{project_path}/Assets/{type}/{asset_name}/{step}/approve/{file_name}'
+    shot_work_path: '{project_path}/Sequences/{type}/{shot}/{step}/work/{file_name}'
+    shot_approve_path: '{project_path}/Sequences/{type}/{shot}/{step}/approve/{file_name}'
+    
+    work_format:
+        maya: mb
+    
+asset:
+    Model:
+        name: Model
+        short_name: model
+        file_name: '{asset_name}_{short_name}_v###.{work_format}'
+
+    Texture:
+        name: Texture
+        short_name: tex
+        file_name: '{asset_name}_{short_name}_v###.{work_format}'
+        
+    Rig:
+        name: Rig
+        short_name: rig
+        file_name: '{asset_name}_{short_name}_v###.{work_format}'
+
+shot:
+    Layout:
+        name: Layout
+        short_name: lay
+        file_name: '{sequence}_{shot}_{short_name}_v###.{work_format}'
+        
+    Animation:
+        name: Animation
+        short_name: ani
+        file_name: '{sequence}_{shot}_{short_name}_v###.{work_format}'
+        
+    charEffect:
+        name: charEffect
+        short_name: cf
+        file_name: '{sequence}_{shot}_{short_name}_v###.{work_format}'
+
+    sceneEffect:
+        name: sceneEffect
+        short_name: sf
+        file_name: '{sequence}_{shot}_{short_name}_v###.{work_format}'
+
+    Light:
+        name: Light
+        short_name: lig
+        file_name: '{sequence}_{shot}_{short_name}_v###.{work_format}'
