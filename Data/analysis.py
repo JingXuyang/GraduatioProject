@@ -8,6 +8,32 @@ import os
 yamlname = os.path.join(os.path.dirname(__file__), 'config.yaml').replace("\\", "/")
 print yamlname
 
+def get_variable(str):
+
+    ref_con = ReadCofig()
+
+    state = {}
+    state["project_path"] = ref_con.get_global()
+    state["type"] = ref_con.allSteps('asset')
+    state["asset_name"] = "char"
+    state["file_name"] = ref_con.get_global()
+    # state["seq"] = ref_con.get_global()
+    # state["shot"] = ref_con.get_global()
+
+    before = str.split("/")
+    after = []
+    for i in before:
+        if "{" in i:
+            var = i[1:-1]
+            if var in state.keys():
+                var = state[var]
+            after.append(var)
+        else:
+            after.append(i)
+
+    return  "_".join(after)
+
+
 class ReadCofig(object):
 
     def __init__(self):
@@ -25,8 +51,17 @@ class ReadCofig(object):
                 for ii in self.data[i]:
                     if ii == "project_path":
                         dir['project_path'] = self.data[i][ii]
-                    elif ii == "asset_work_path":
+        return dir
+
+    def get_save_path(self):
+
+        dir = {}
+        for i in self.data:
+            if i == "global":
+                for ii in self.data[i]:
+                    if ii == "asset_work_path":
                         dir['asset_work_parh'] = self.data[i][ii]
+                        print get_variable(self.data[i][ii])
                     elif ii == "asset_approve_path":
                         dir['asset_approve_path'] = self.data[i][ii]
                     elif ii == "shot_work_path":
@@ -80,10 +115,10 @@ class ReadCofig(object):
 
 
 
-# ana = ReadCofig("asset","Model")
-# a = ana.get_step_message()
-# b = ana.allSteps()
+# ana = ReadCofig()
+# # a = ana.get_step_message()
+# # b = ana.allSteps()
 # c = ana.get_global()
 # # print a
-# print b
-# # print c
+# # print b
+# print c
