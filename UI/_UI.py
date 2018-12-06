@@ -34,7 +34,7 @@ class AssetWin(QtGui.QWidget):
         self.asset_win.setSortingEnabled(True)
         # self.header().setStretchLastSection(True)
         head_list = [u"名称", u"环节", u"说明"]
-        root_list = ["char", "prop", "set"]
+        root_list = ["Character", "Prop", "Set"]
         for i in root_list:
             root = QtGui.QTreeWidgetItem(self.asset_win)
             root.setText(0, i)
@@ -93,14 +93,9 @@ class AssetWin(QtGui.QWidget):
         if item.childCount():
             pass
         else:
-
             par = self.asset_win.currentItem().parent().text(0)
-            if par == "char":
-                type = "Character"
-            elif par == "prop":
-                type = "Prop"
-            elif par == "set":
-                type = "Set"
+
+        config_data.get_global()
 
         self.sel_path = config_data.get_global()['project_path']
         print self.sel_path
