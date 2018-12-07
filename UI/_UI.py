@@ -91,6 +91,7 @@ class AssetWin(QtGui.QWidget):
         item.takeChildren()
         set = (pro_path, "Assets", item.text(0))
         child = tree_item( "/".join(set) )
+        print child
         asset_step.sort()
         for chi in asset_step:
             root = QtGui.QTreeWidgetItem(item)
