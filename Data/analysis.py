@@ -6,7 +6,7 @@ import yaml
 import os
 
 yamlname = os.path.join(os.path.dirname(__file__), 'config.yaml').replace("\\", "/")
-print yamlname
+
 
 def get_variable(str):
 

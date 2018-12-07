@@ -1,12 +1,10 @@
 global:
-    project_path: 'D:\project\WSF_CG01'
+    project_path: 'D:/JXY_Work/GraduatioProject/project/WSF_CG01'
     asset_work_path: '{project_path}/Assets/{type}/{asset_name}/{step}/work/{file_name}'
     asset_approve_path: '{project_path}/Assets/{type}/{asset_name}/{step}/approve/{file_name}'
-    shot_work_path: '{project_path}/Sequences/{type}/{shot}/{step}/work/{file_name}'
-    shot_approve_path: '{project_path}/Sequences/{type}/{shot}/{step}/approve/{file_name}'
+    shot_work_path: '{project_path}/Sequences/{seq}/{shot}/{step}/work/{file_name}'
+    shot_approve_path: '{project_path}/Sequences/{seq}/{shot}/{step}/approve/{file_name}'
     
-    work_format:
-        maya: mb
     
 asset:
     Model:

@@ -10,14 +10,16 @@ from Data import analysis
 from Action import action
 
 # Global Value
+
 gf = action.OS()
 config_data = analysis.ReadCofig()
+pro_path = config_data.get_global()['project_path']
 asset_step = config_data.allSteps('asset')
 shot_step = config_data.allSteps('shot')
 
 def tree_item(path):
-    folder = gf.getFolders(path)
-    print folder
+    folder = gf.get_folders(path)
+    return folder
 
 
 class AssetWin(QtGui.QWidget):
@@ -38,10 +40,9 @@ class AssetWin(QtGui.QWidget):
         for i in root_list:
             root = QtGui.QTreeWidgetItem(self.asset_win)
             root.setText(0, i)
-            asset_step.sort()
-            for chi in asset_step:
-                child = QtGui.QTreeWidgetItem(root)
-                child.setText(1, chi)
+            child = QtGui.QTreeWidgetItem(root)
+            child.setText(0, "")
+
         self.asset_win.setHeaderLabels(head_list)
 
         # ------------------ 中间部分 -------------------
@@ -84,6 +85,20 @@ class AssetWin(QtGui.QWidget):
 
         # ------------------ 信号与槽 -------------------
         self.asset_win.itemClicked.connect(self.click)
+        self.asset_win.itemExpanded.connect(self.addChild)
+
+    def addChild(self, item):
+        item.takeChildren()
+        set = (pro_path, "Assets", item.text(0))
+        child = tree_item( "/".join(set) )
+        asset_step.sort()
+        for chi in asset_step:
+            root = QtGui.QTreeWidgetItem(item)
+            root.setText(1, chi)
+            if len(child) > 0: #如果有资产
+                for name in child:
+                    root.setText(0, name)
+
 
     def click(self, item):
         '''
@@ -96,7 +111,6 @@ class AssetWin(QtGui.QWidget):
             par = self.asset_win.currentItem().parent().text(0)
 
         config_data.get_global()
-
         self.sel_path = config_data.get_global()['project_path']
         print self.sel_path
 
