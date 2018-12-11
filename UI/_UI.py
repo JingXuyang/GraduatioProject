@@ -54,7 +54,7 @@ class AssetWin(QtGui.QWidget):
 
         # ------------------ 文件窗口 -------------------
         self.file_win = QtGui.QTreeWidget()
-        head_list = [u"名称", u"艺术家", u"说明", u"大小"]
+        head_list = [u"名称", u"艺术家", u"说明", u"修改时间", u"大小", u"路径"]
         self.file_win.setHeaderLabels(head_list)
 
         # ------------------ 底部部分 -------------------
@@ -88,35 +88,53 @@ class AssetWin(QtGui.QWidget):
         self.asset_win.itemExpanded.connect(self.addChild)
 
     def addChild(self, item):
+        '''
+        搜索文件夹添加到item
+        '''
         item.takeChildren()
         set = (pro_path, "Assets", item.text(0))
-        child = tree_item( "/".join(set) )
-        print child
-        asset_step.sort()
-        for chi in asset_step:
-            root = QtGui.QTreeWidgetItem(item)
-            root.setText(1, chi)
-            if len(child) > 0: #如果有资产
-                for name in child:
+        child = tree_item("/".join(set))
+        # 如果有资产
+        if len(child) > 0:
+            for name in child:
+                asset_step = gf.get_folders("/".join(set)+"/"+name)
+                asset_step.sort()
+                for chi in asset_step:
+                    root = QtGui.QTreeWidgetItem(item)
                     root.setText(0, name)
+                    root.setText(1, chi)
+        else:
+            root = QtGui.QTreeWidgetItem(item)
+            root.setText(1, "")
 
 
     def click(self, item):
-        '''
-        :type: type是 "char", "prop", "set"
-        '''
-        # 如果是父节点
-        if item.childCount():
-            pass
-        else:
+        self.file_win.clear()
+        work_root = QtGui.QTreeWidgetItem(self.file_win)
+        work_root.setText(0, "Work")
+        approve_root = QtGui.QTreeWidgetItem(self.file_win)
+        approve_root.setText(0, "Approve")
+        # 点击子节点
+        if not item.childCount():
             par = self.asset_win.currentItem().parent().text(0)
 
-        config_data.get_global()
-        self.sel_path = config_data.get_global()['project_path']
-        print self.sel_path
+            # work 下的子节点
+            work_set = (config_data.get_global()['project_path'], "Assets", par,
+                        self.asset_win.currentItem().text(0), self.asset_win.currentItem().text(1), "Work")
+            work_path = "/".join(work_set)
+            file_ls = gf.get_filses(work_path)
+            root = QtGui.QTreeWidgetItem(work_root)
+            for i in file_ls:
+                root.setText(0, gf.get_basename(i))
 
-        root = QtGui.QTreeWidgetItem(self.file_win)
-        root.setText(0, self.asset_win.currentItem().text(1))
+            # approve 下的子节点
+            approve_set = (config_data.get_global()['project_path'], "Assets", par,
+                           self.asset_win.currentItem().text(0), self.asset_win.currentItem().text(1), "Approve")
+            approve_path = "/".join(approve_set)
+            file_ls = gf.get_filses(approve_path)
+            root = QtGui.QTreeWidgetItem(approve_root)
+            for i in file_ls:
+                root.setText(0, gf.get_basename(i))
 
 
 class ShotWin(QtGui.QWidget):

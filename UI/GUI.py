@@ -13,10 +13,6 @@ import _UI
 class Window(QtGui.QDialog):
     def __init__(self, parent=None):
         super(Window, self).__init__(parent)
-        # qss_file = open("style.qss").read()
-        # self.setStyleSheet(qss_file)
-        # qss_file = open("style_RF.qss").read()
-        # self.setStyleSheet(qss_file)
         self.setWindowTitle("Open")
         self.resize(800, 600)
 
