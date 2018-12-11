@@ -66,9 +66,9 @@ class OS(object):
         :return: 返回文件名
         '''
         if os.path.exists(path):
-            return os.path.splitext(path)[0]
+            return os.path.basename(path).split(".")[0]
         else:
             return ""
 
 gf = OS()
-print gf.get_filses(r"D:/JXY_Work/GraduatioProject/project/WSF_CG01/Assets/Character/QIU/Model/Work")
+print gf.get_basename(r"D:/JXY_Work/GraduatioProject/project/WSF_CG01/Assets/Character/QIU/Model/Work/QIU_model_v001_high.mb")
