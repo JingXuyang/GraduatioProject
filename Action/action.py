@@ -6,7 +6,6 @@ import os
 from Data import analysis
 
 config_data = analysis.ReadCofig()
-rootdir = config_data.get_global()
 
 FileType = [".mb", ".abc", ".ma"]
 
@@ -35,8 +34,8 @@ class OS(object):
             folder = []
             list = os.listdir(path)  # 列出文件夹下所有的目录
             for i in range(0, len(list)):
-                path = os.path.join(path, list[i])
-                if os.path.isdir(path):
+                temp = os.path.join(path, list[i])
+                if os.path.isdir(temp):
                     folder.append(list[i])
             return folder
         else:
@@ -52,10 +51,24 @@ class OS(object):
             files = []
             list = os.listdir(path)  # 列出文件夹下所有的文件
             for i in range(0, len(list)):
-                path = os.path.join(rootdir, list[i])
-                if os.path.isfile(path):
-                    if self.cg_type(path):
+                temp = os.path.join(path, list[i])
+                if os.path.isfile(temp):
+                    if self.cg_type(temp):
                         files.append(list[i])
             return files
         else:
             return []
+
+    def get_basename(self, path):
+        '''
+
+        :param path: 路径
+        :return: 返回文件名
+        '''
+        if os.path.exists(path):
+            return os.path.splitext(path)[0]
+        else:
+            return ""
+
+gf = OS()
+print gf.get_filses(r"D:/JXY_Work/GraduatioProject/project/WSF_CG01/Assets/Character/QIU/Model/Work")
