@@ -3,7 +3,11 @@
 #
 
 import os
+import time
+import datetime
+
 from Data import analysis
+
 
 config_data = analysis.ReadCofig()
 
@@ -70,5 +74,31 @@ class OS(object):
         else:
             return ""
 
+
 gf = OS()
-print gf.get_basename(r"D:/JXY_Work/GraduatioProject/project/WSF_CG01/Assets/Character/QIU/Model/Work/QIU_model_v001_high.mb")
+# print gf.get_basename(r"D:/JXY_Work/GraduatioProject/UI/GUI.py")
+
+class FileMessage(object):
+
+    # 把时间戳转化为时间: 1479264792 to 2016-11-16 10:53:12
+    def TimeStampToTime(self, timestamp):
+        timeStruct = time.localtime(timestamp)
+        return time.strftime('%Y-%m-%d %H:%M:%S', timeStruct)
+
+    #获取文件的大小,结果保留两位小数，单位为MB
+    def get_FileSize(self, filePath):
+        fsize = os.path.getsize(filePath)
+        fsize1 = fsize / float(1024 * 1024)
+        print fsize
+        if fsize1 > 1:
+            return str(round(fsize1, 1)) + "MB"
+        else:
+            fsize1 = fsize / float(1024)
+            return str(round(fsize1, 1)) + "KB"
+
+    # 获取文件的修改时间
+    def get_FileModifyTime(self, filePath):
+        t = os.path.getmtime(filePath)
+        return self.TimeStampToTime(t)
+fl = FileMessage()
+# print fl.get_FileSize(r"D:\JXY_Work\test\yanshi.mpg")

@@ -13,6 +13,7 @@ from Action import action
 
 gf = action.OS()
 config_data = analysis.ReadCofig()
+file_mes = action.FileMessage()
 pro_path = config_data.get_global()['project_path']
 asset_step = config_data.allSteps('asset')
 shot_step = config_data.allSteps('shot')
@@ -20,7 +21,6 @@ shot_step = config_data.allSteps('shot')
 def tree_item(path):
     folder = gf.get_folders(path)
     return folder
-
 
 class AssetWin(QtGui.QWidget):
     def __init__(self, parent=None):
@@ -58,9 +58,9 @@ class AssetWin(QtGui.QWidget):
         self.file_win.setHeaderLabels(head_list)
 
         # ------------------ 底部部分 -------------------
-        self.export = QtGui.QPushButton(u"导入")
-        self.refer = QtGui.QPushButton(u"参考")
-        self.open = QtGui.QPushButton(u"打开")
+        input = QtGui.QPushButton(u"导入")
+        refer = QtGui.QPushButton(u"参考")
+        open = QtGui.QPushButton(u"打开")
 
         # ------------------ 布局 -------------------
         mid = QtGui.QHBoxLayout()
@@ -70,9 +70,9 @@ class AssetWin(QtGui.QWidget):
 
         bottom = QtGui.QHBoxLayout()
         bottom.addStretch()
-        bottom.addWidget(self.export)
-        bottom.addWidget(self.refer)
-        bottom.addWidget(self.open)
+        bottom.addWidget(input)
+        bottom.addWidget(refer)
+        bottom.addWidget(open)
 
         lay = QtGui.QVBoxLayout()
         lay.setSpacing(0)
@@ -86,10 +86,12 @@ class AssetWin(QtGui.QWidget):
         # ------------------ 信号与槽 -------------------
         self.asset_win.itemClicked.connect(self.click)
         self.asset_win.itemExpanded.connect(self.addChild)
+        input.clicked.connect(self.input)
+
 
     def addChild(self, item):
         '''
-        搜索文件夹添加到item
+        搜索文件夹添加到资产的item
         '''
         item.takeChildren()
         set = (pro_path, "Assets", item.text(0))
@@ -109,6 +111,9 @@ class AssetWin(QtGui.QWidget):
 
 
     def click(self, item):
+        '''
+        添加文件详细信息
+        '''
         self.file_win.clear()
         work_root = QtGui.QTreeWidgetItem(self.file_win)
         work_root.setText(0, "Work")
@@ -125,7 +130,11 @@ class AssetWin(QtGui.QWidget):
             file_ls = gf.get_filses(work_path)
             root = QtGui.QTreeWidgetItem(work_root)
             for i in file_ls:
-                root.setText(0, gf.get_basename(i))
+                fl_path = work_path + "/" + i
+                root.setText(0, gf.get_basename(fl_path))
+                root.setText(3, file_mes.get_FileModifyTime(fl_path))
+                root.setText(4, file_mes.get_FileSize(fl_path))
+                root.setText(5, fl_path)
 
             # approve 下的子节点
             approve_set = (config_data.get_global()['project_path'], "Assets", par,
@@ -134,7 +143,15 @@ class AssetWin(QtGui.QWidget):
             file_ls = gf.get_filses(approve_path)
             root = QtGui.QTreeWidgetItem(approve_root)
             for i in file_ls:
-                root.setText(0, gf.get_basename(i))
+                fl_path = approve_path+"/"+i
+                root.setText(0, gf.get_basename(fl_path))
+                root.setText(3, file_mes.get_FileModifyTime(fl_path))
+                root.setText(4, file_mes.get_FileSize(fl_path))
+                root.setText(5, fl_path)
+
+    def input(self):
+        if self.file_win:
+            print self.file_win.currentItem().text(5)
 
 
 class ShotWin(QtGui.QWidget):
@@ -151,14 +168,12 @@ class ShotWin(QtGui.QWidget):
         self.shot_win.setSortingEnabled(True)
         # self.header().setStretchLastSection(True)
         head_list = [u"名称", u"环节", u"说明"]
-        root_list = ["char", "prop", "set"]
+        root_list = ["Sequences"]
         for i in root_list:
             root = QtGui.QTreeWidgetItem(self.shot_win)
             root.setText(0, i)
-            shot_step.sort()
-            for chi in shot_step:
-                child = QtGui.QTreeWidgetItem(root)
-                child.setText(1, chi)
+            child = QtGui.QTreeWidgetItem(root)
+            child.setText(1, "")
         self.shot_win.setHeaderLabels(head_list)
 
         # ------------------ 中间部分 -------------------
@@ -172,13 +187,13 @@ class ShotWin(QtGui.QWidget):
 
         # ------------------ 文件窗口 -------------------
         self.file_win = QtGui.QTreeWidget()
-        head_list = [u"名称", u"艺术家", u"说明", u"大小"]
+        head_list = [u"名称", u"艺术家", u"说明", u"修改时间", u"大小", u"路径"]
         self.file_win.setHeaderLabels(head_list)
 
         # ------------------ 底部部分 -------------------
-        self.export = QtGui.QPushButton(u"导入")
-        self.refer = QtGui.QPushButton(u"参考")
-        self.open = QtGui.QPushButton(u"打开")
+        input = QtGui.QPushButton(u"导入")
+        refer = QtGui.QPushButton(u"参考")
+        open = QtGui.QPushButton(u"打开")
 
         # ------------------ 布局 -------------------
         mid = QtGui.QHBoxLayout()
@@ -188,9 +203,9 @@ class ShotWin(QtGui.QWidget):
 
         bottom = QtGui.QHBoxLayout()
         bottom.addStretch()
-        bottom.addWidget(self.export)
-        bottom.addWidget(self.refer)
-        bottom.addWidget(self.open)
+        bottom.addWidget(input)
+        bottom.addWidget(refer)
+        bottom.addWidget(open)
 
         lay = QtGui.QVBoxLayout()
         lay.setSpacing(0)
@@ -202,7 +217,102 @@ class ShotWin(QtGui.QWidget):
         self.setLayout(lay)
 
         # ------------------ 信号与槽 -------------------
+        self.shot_win.itemClicked.connect(self.click)
+        self.shot_win.itemExpanded.connect(self.addChild)
+        input.clicked.connect(self.input)
 
+    def addChild(self, item):
+        '''
+        搜索文件夹添加到资产的item
+        '''
+        item.takeChildren()
+        # # 展开子层级的时候
+        # if item.parent():
+
+        it = QtGui.QTreeWidgetItemIterator(self.shot_win)
+
+        root_ls = []
+        root_ls.append(pro_path)
+        # 该类的value()即为QTreeWidgetItem
+        while it.value():
+            if it.value().childCount:
+                root_ls.append(it.value().text(0))
+
+        child = tree_item("/".join(root_ls))  # 场次列表
+        if len(child) > 0:
+            for name in child:
+                seq = gf.get_folders("/".join(root_ls) + "/" + name)
+                seq.sort()
+                for chi in seq:
+                    root = QtGui.QTreeWidgetItem(item)
+                    root.setText(0, chi)
+
+
+        # # 展开父层级("Sequence")的时候
+        # else:
+        #     set = (pro_path, item.text(0))
+        #     child = tree_item("/".join(set))
+        #     root = QtGui.QTreeWidgetItem(item)
+        #     root.setText(0, child)
+
+        # print "jxy", child
+        # # 如果有镜头
+        # if len(child) > 0:
+        #     for name in child:
+        #         seq = gf.get_folders("/".join(set)+"/"+name)
+        #         seq.sort()
+        #         for chi in seq:
+        #             root = QtGui.QTreeWidgetItem(item)
+        #             root.setText(0, name)
+        #             root2 = QtGui.QTreeWidgetItem(root)
+        #
+        #             root2.setText(0, chi)
+        # else:
+        #     root = QtGui.QTreeWidgetItem(item)
+        #     root.setText(1, "")
+
+    def click(self, item):
+        '''
+        添加文件详细信息
+        '''
+        self.file_win.clear()
+        work_root = QtGui.QTreeWidgetItem(self.file_win)
+        work_root.setText(0, "Work")
+        approve_root = QtGui.QTreeWidgetItem(self.file_win)
+        approve_root.setText(0, "Approve")
+        # 点击子节点
+        if not item.childCount():
+            par = self.shot_win.currentItem().parent().text(0)
+
+            # work 下的子节点
+            work_set = (config_data.get_global()['project_path'], "Sequences", par,
+                        self.shot_win.currentItem().text(0), self.shot_win.currentItem().text(1), "Work")
+            work_path = "/".join(work_set)
+            file_ls = gf.get_filses(work_path)
+            root = QtGui.QTreeWidgetItem(work_root)
+            for i in file_ls:
+                fl_path = work_path + "/" + i
+                root.setText(0, gf.get_basename(fl_path))
+                root.setText(3, file_mes.get_FileModifyTime(fl_path))
+                root.setText(4, file_mes.get_FileSize(fl_path))
+                root.setText(5, fl_path)
+
+            # approve 下的子节点
+            approve_set = (config_data.get_global()['project_path'], "Sequences", par,
+                           self.shot_win.currentItem().text(0), self.shot_win.currentItem().text(1), "Approve")
+            approve_path = "/".join(approve_set)
+            file_ls = gf.get_filses(approve_path)
+            root = QtGui.QTreeWidgetItem(approve_root)
+            for i in file_ls:
+                fl_path = approve_path+"/"+i
+                root.setText(0, gf.get_basename(fl_path))
+                root.setText(3, file_mes.get_FileModifyTime(fl_path))
+                root.setText(4, file_mes.get_FileSize(fl_path))
+                root.setText(5, fl_path)
+
+    def input(self):
+        if self.file_win:
+            print self.file_win.currentItem().text(5)
 
 class MyTabWidget(QtGui.QTabWidget):
 
