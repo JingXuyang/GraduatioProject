@@ -45,7 +45,7 @@ class OS(object):
         else:
             return []
 
-    def get_filses(self, path):
+    def get_files(self, path):
         '''
         
         :param path: 路径
@@ -73,10 +73,8 @@ class OS(object):
             return os.path.basename(path).split(".")[0]
         else:
             return ""
-
-
-gf = OS()
-# print gf.get_basename(r"D:/JXY_Work/GraduatioProject/UI/GUI.py")
+# a = OS()
+# print a.get_files(r"D:/JXY_Work/GraduatioProject/project/WSF_CG01/Sequences/Seq01/Shot001/Animation/Approve")
 
 class FileMessage(object):
 
@@ -100,5 +98,4 @@ class FileMessage(object):
     def get_FileModifyTime(self, filePath):
         t = os.path.getmtime(filePath)
         return self.TimeStampToTime(t)
-fl = FileMessage()
-# print fl.get_FileSize(r"D:\JXY_Work\test\yanshi.mpg")
+
