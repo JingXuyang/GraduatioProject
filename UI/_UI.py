@@ -34,8 +34,12 @@ class AssetWin(QtGui.QWidget):
         self.asset_win = QtGui.QTreeWidget()
         # 可排序
         self.asset_win.setSortingEnabled(True)
-        # 根据内容自动调整列宽
-        self.asset_win.header().setResizeMode(QtGui.QHeaderView.ResizeToContents)
+        # 需要时水平滚动条, 双击滚动条不会还原
+        self.asset_win.setHorizontalScrollBarPolicy(QtCore.Qt.ScrollBarAsNeeded)
+        self.asset_win.header().setResizeMode(1, QtGui.QHeaderView.ResizeToContents)
+        self.asset_win.header().setStretchLastSection(False)
+        self.asset_win.setAutoScroll(False)
+
         head_list = [u"名称", u"环节", u"说明"]
         root_list = ["Character", "Prop", "Set"]
         for i in root_list:
@@ -55,8 +59,11 @@ class AssetWin(QtGui.QWidget):
 
         # ------------------ 文件窗口 -------------------
         self.file_win = QtGui.QTreeWidget()
-        # 需要时水平滚动条
+        # 需要时水平滚动条, 双击滚动条不会还原
         self.file_win.setHorizontalScrollBarPolicy(QtCore.Qt.ScrollBarAsNeeded)
+        self.file_win.header().setResizeMode(1, QtGui.QHeaderView.ResizeToContents)
+        self.file_win.header().setStretchLastSection(False)
+        self.file_win.setAutoScroll(False)
         head_list = [u"名称", u"艺术家", u"说明", u"修改时间", u"大小", u"路径"]
         self.file_win.setHeaderLabels(head_list)
 
@@ -125,11 +132,12 @@ class AssetWin(QtGui.QWidget):
         # 点击子节点
         if not item.childCount():
             par = self.asset_win.currentItem().parent().text(0)
+
             # work 下的子节点
             work_set = (config_data.get_global()['project_path'], "Assets", par,
                         self.asset_win.currentItem().text(0), self.asset_win.currentItem().text(1), "Work")
             work_path = "/".join(work_set)
-            file_ls = gf.get_filses(work_path)
+            file_ls = gf.get_files(work_path)
             root = QtGui.QTreeWidgetItem(work_root)
             for i in file_ls:
                 fl_path = work_path + "/" + i
@@ -142,10 +150,10 @@ class AssetWin(QtGui.QWidget):
             approve_set = (config_data.get_global()['project_path'], "Assets", par,
                            self.asset_win.currentItem().text(0), self.asset_win.currentItem().text(1), "Approve")
             approve_path = "/".join(approve_set)
-            file_ls = gf.get_filses(approve_path)
-            root = QtGui.QTreeWidgetItem(approve_root)
+            file_ls = gf.get_files(approve_path)
             for i in file_ls:
                 fl_path = approve_path+"/"+i
+                root = QtGui.QTreeWidgetItem(approve_root)
                 root.setText(0, gf.get_basename(fl_path))
                 root.setText(3, file_mes.get_FileModifyTime(fl_path))
                 root.setText(4, file_mes.get_FileSize(fl_path))
@@ -168,8 +176,11 @@ class ShotWin(QtGui.QWidget):
         self.shot_win = QtGui.QTreeWidget()
         # 可排序
         self.shot_win.setSortingEnabled(True)
-        # 需要时水平滚动条
+        # 需要时水平滚动条, 双击滚动条不会还原
         self.shot_win.setHorizontalScrollBarPolicy(QtCore.Qt.ScrollBarAsNeeded)
+        self.shot_win.header().setResizeMode(1, QtGui.QHeaderView.ResizeToContents)
+        self.shot_win.header().setStretchLastSection(False)
+        self.shot_win.setAutoScroll(False)
         # 根据内容自动调整列宽
         self.shot_win.header().setResizeMode(QtGui.QHeaderView.ResizeToContents)
 
@@ -195,7 +206,7 @@ class ShotWin(QtGui.QWidget):
         self.file_win = QtGui.QTreeWidget()
         # 根据内容自动调整列宽
         self.file_win.header().setResizeMode(QtGui.QHeaderView.ResizeToContents)
-        # 需要时水平滚动条
+        # 需要时水平滚动条, 双击滚动条不会还原
         self.file_win.setHorizontalScrollBarPolicy(QtCore.Qt.ScrollBarAsNeeded)
         self.file_win.header().setResizeMode(1, QtGui.QHeaderView.ResizeToContents)
         self.file_win.header().setStretchLastSection(False)
@@ -281,7 +292,7 @@ class ShotWin(QtGui.QWidget):
             # work 下的子节点
             work_set = ("/".join(self.root_ls), self.shot_win.currentItem().text(0), "Work")
             work_path = "/".join(work_set)
-            file_ls = gf.get_filses(work_path)
+            file_ls = gf.get_files(work_path)
             root = QtGui.QTreeWidgetItem(work_root)
             for i in file_ls:
                 fl_path = work_path + "/" + i
@@ -293,9 +304,9 @@ class ShotWin(QtGui.QWidget):
             # approve 下的子节点
             approve_set = ("/".join(self.root_ls), self.shot_win.currentItem().text(0), "Approve")
             approve_path = "/".join(approve_set)
-            file_ls = gf.get_filses(approve_path)
-            root = QtGui.QTreeWidgetItem(approve_root)
+            file_ls = gf.get_files(approve_path)
             for i in file_ls:
+                root = QtGui.QTreeWidgetItem(approve_root)
                 fl_path = approve_path+"/"+i
                 root.setText(0, gf.get_basename(fl_path))
                 root.setText(3, file_mes.get_FileModifyTime(fl_path))
