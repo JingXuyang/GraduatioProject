@@ -14,10 +14,12 @@ class Window(QtGui.QDialog):
     def __init__(self, parent=None):
         super(Window, self).__init__(parent)
         self.setWindowTitle("Open")
-        self.resize(800, 600)
+        # self.resize(800, 600)
 
         # 实例化窗口
-        self.assetWin = _UI.MyTabWidget()
+        # self.assetWin = _UI.OpenWidget()
+        # self.assetWin = _UI.SubWin("Animation")
+        self.assetWin = _UI.SaveWidget()
 
         self._Ui()
 

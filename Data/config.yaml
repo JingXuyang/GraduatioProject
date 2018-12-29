@@ -10,6 +10,11 @@ asset:
     Model:
         name: Model
         short_name: model
+        describtion_item: 
+          - low
+          - middle
+          - high
+
         file_name: '{asset_name}_{short_name}_v###.{work_format}'
 
     Texture:

@@ -4,6 +4,7 @@
 
 import os
 import time
+import json
 import datetime
 
 from Data import analysis
@@ -12,6 +13,8 @@ from Data import analysis
 config_data = analysis.ReadCofig()
 
 FileType = [".mb", ".abc", ".ma"]
+CachePath = "C:/Users/" + os.getenv('username') + "/.jxy"
+
 
 class OS(object):
 
@@ -98,4 +101,32 @@ class FileMessage(object):
     def get_FileModifyTime(self, filePath):
         t = os.path.getmtime(filePath)
         return self.TimeStampToTime(t)
+
+class CacheInfo(object):
+
+    def read_json(self, path):
+        '''
+        
+        :param path: json 文件路径
+        :return: 返回json内容 
+        '''
+        with open(path) as file:
+            return json.loads(file.read())
+
+    def write_json(self, info, path, filename):
+        '''
+        
+        :param info: 需要写入的文件信息，写入到
+        :param filename: json文件名
+        :return: 返回文件信息
+        '''
+        text = json.dumps(info, indent=4)
+        # jsonPath = "{0}/{1}.json".format(CachePath, filename)
+        jsonPath = "{0}/{1}.json".format(path, filename)
+        f = open(jsonPath, "w")
+        f.write(text)
+        f.close()
+
+        return text
+
 

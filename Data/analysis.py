@@ -85,7 +85,6 @@ class ReadCofig(object):
         return ls
 
     def get_step_message(self, sequence='', step=''):
-
         '''
         :sequence :  shot 或者 asset
         :step :  环节
@@ -99,16 +98,13 @@ class ReadCofig(object):
         dir = {}
 
         for seq in self.data:
-            if seq == self.sequence:
+            if seq == sequence:
                 ls = []
                 for step in self.data[seq]:
                     ls.append(step)
-                    if step == self.step:
+                    if step == step:
                         for detail in self.data[seq][step]:
-                            if detail == "short_name":
-                                dir["short_name"] = self.data[seq][step][detail]
-                            if detail == "file_name":
-                                dir["file_name"] = self.data[seq][step][detail]
+                            dir[detail] = self.data[seq][step][detail]
 
         return dir
 

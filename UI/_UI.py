@@ -17,10 +17,13 @@ file_mes = action.FileMessage()
 pro_path = config_data.get_global()['project_path']
 asset_step = config_data.allSteps('asset')
 shot_step = config_data.allSteps('shot')
+# print config_data.get_step_message("asset", "Animation")
+
 
 def tree_item(path):
     folder = gf.get_folders(path)
     return folder
+
 
 class AssetWin(QtGui.QWidget):
     def __init__(self, parent=None):
@@ -78,18 +81,18 @@ class AssetWin(QtGui.QWidget):
         mid.addStretch()
         mid.addWidget(self.asset_search)
 
-        bottom = QtGui.QHBoxLayout()
-        bottom.addStretch()
-        bottom.addWidget(input)
-        bottom.addWidget(refer)
-        bottom.addWidget(open)
+        self.bottom = QtGui.QHBoxLayout()
+        self.bottom.addStretch()
+        self.bottom.addWidget(input)
+        self.bottom.addWidget(refer)
+        self.bottom.addWidget(open)
 
         lay = QtGui.QVBoxLayout()
         lay.setSpacing(0)
         lay.addWidget(self.asset_win)
         lay.addLayout(mid)
         lay.addWidget(self.file_win)
-        lay.addLayout(bottom)
+        lay.addLayout(self.bottom)
 
         self.setLayout(lay)
 
@@ -97,7 +100,6 @@ class AssetWin(QtGui.QWidget):
         self.asset_win.itemClicked.connect(self.click)
         self.asset_win.itemExpanded.connect(self.addChild)
         input.clicked.connect(self.input)
-
 
     def addChild(self, item):
         '''
@@ -118,7 +120,6 @@ class AssetWin(QtGui.QWidget):
         else:
             root = QtGui.QTreeWidgetItem(item)
             root.setText(1, "")
-
 
     def click(self, item):
         '''
@@ -226,18 +227,18 @@ class ShotWin(QtGui.QWidget):
         mid.addStretch()
         mid.addWidget(self.asset_search)
 
-        bottom = QtGui.QHBoxLayout()
-        bottom.addStretch()
-        bottom.addWidget(input)
-        bottom.addWidget(refer)
-        bottom.addWidget(open)
+        self.bottom = QtGui.QHBoxLayout()
+        self.bottom.addStretch()
+        self.bottom.addWidget(input)
+        self.bottom.addWidget(refer)
+        self.bottom.addWidget(open)
 
         lay = QtGui.QVBoxLayout()
         lay.setSpacing(0)
         lay.addWidget(self.shot_win)
         lay.addLayout(mid)
         lay.addWidget(self.file_win)
-        lay.addLayout(bottom)
+        lay.addLayout(self.bottom)
 
         self.setLayout(lay)
 
@@ -317,10 +318,11 @@ class ShotWin(QtGui.QWidget):
         if self.file_win:
             print self.file_win.currentItem().text(5)
 
-class MyTabWidget(QtGui.QTabWidget):
+
+class OpenWidget(QtGui.QTabWidget):
 
     def __init__(self, parent=None):
-        super(MyTabWidget, self).__init__(parent)
+        super(OpenWidget, self).__init__(parent)
         self.setWindowTitle("Open")
         self.resize(700, 600)
         self._ui()
@@ -334,5 +336,106 @@ class MyTabWidget(QtGui.QTabWidget):
 
         self.addTab(self.tab1, u"资产")
         self.addTab(self.tab2, u"镜头")
+
+
+class SaveWidget(QtGui.QTabWidget):
+
+    def __init__(self, parent=None):
+        super(SaveWidget, self).__init__(parent)
+        self.setWindowTitle("Save")
+        self.resize(700, 600)
+        self._ui()
+
+    def _ui(self):
+
+        # ------------------主界面 -------------------
+
+        self.tab1 = AssetWin()
+        self.clearLayout(self.tab1.bottom)
+        saveBtn = QtGui.QPushButton(u"保存")
+        lay = QtGui.QHBoxLayout()
+        lay.addStretch()
+        lay.addWidget(saveBtn)
+        self.tab1.layout().insertLayout(4, lay)
+
+        self.tab2 = ShotWin()
+        self.clearLayout(self.tab2.bottom)
+        saveBtn1 = QtGui.QPushButton(u"保存")
+        lay1 = QtGui.QHBoxLayout()
+        lay1.addStretch()
+        lay1.addWidget(saveBtn1)
+        self.tab2.layout().insertLayout(4, lay1)
+
+        self.addTab(self.tab1, u"资产")
+        self.addTab(self.tab2, u"镜头")
+
+    def clearLayout(self, layout):
+        '''
+        
+        :param layout: 需要移除的布局
+        '''
+
+        if layout is not None:
+            while layout.count():
+                item = layout.takeAt(0)
+                widget = item.widget()
+                if widget is not None:
+                    widget.deleteLater()
+                else:
+                    self.clearLayout(item.layout())
+
+class SubWin(QtGui.QWidget):
+    def __init__(self, step, parent=None):
+        super(SubWin, self).__init__(parent)
+        self.resize(300, 200)
+        self.setWindowTitle(u"提交")
+        self.step = step
+
+        self._ui()
+
+    def _ui(self):
+
+        # ------------------ 界面 -------------------
+        self.setWindowTitle(self.step.upper() + "Submit")
+
+        des_lab = QtGui.QLabel(u"描述：")
+        self.des_win = QtGui.QTextEdit()
+
+        extend_des_lab = QtGui.QLabel(u"文件描述:")
+        des_com = QtGui.QComboBox()
+        des_com.setMinimumWidth(100)
+
+        sum_butt = QtGui.QPushButton(u"提交")
+        sum_butt.setMaximumWidth(50)
+
+        # ------------------ 布局 -------------------
+
+        lay1 = QtGui.QHBoxLayout()
+        lay1.addWidget(extend_des_lab)
+        lay1.addWidget(des_com)
+        lay1.addStretch()
+
+        lay2 = QtGui.QHBoxLayout()
+        lay2.addStretch()
+        lay2.addWidget(sum_butt)
+
+        lay = QtGui.QVBoxLayout()
+        lay.addWidget(des_lab)
+        lay.addWidget(self.des_win)
+        lay.addLayout(lay1)
+        lay.addLayout(lay2)
+
+        self.setLayout(lay)
+
+        # ------------------ 信号 -------------------
+        sum_butt.clicked.connect(self.submite)
+
+    def submite(self):
+        print self.des_win.toPlainText()
+
+
+
+
+
 
 
