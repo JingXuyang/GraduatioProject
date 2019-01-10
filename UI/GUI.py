@@ -14,7 +14,7 @@ class Window(QtGui.QDialog):
     def __init__(self, parent=None):
         super(Window, self).__init__(parent)
         self.setWindowTitle("Open")
-        self.resize(800, 650)
+        # self.resize(800, 650)
 
         # 实例化窗口
         # self.assetWin = _UI.OpenWidget()

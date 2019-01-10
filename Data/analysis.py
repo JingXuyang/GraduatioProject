@@ -4,6 +4,7 @@
 
 import yaml
 import os
+import re
 
 yamlname = os.path.join(os.path.dirname(__file__), 'config.yaml').replace("\\", "/")
 
@@ -14,6 +15,8 @@ def get_variable(str):
     :param str: yaml文件中带{}的字符串
     :return: 返回解析后的正确的值
     '''
+
+    funct_ls =  re.findall(r"{(.*?)}", str)
 
     ref_con = ReadCofig()
 
@@ -37,6 +40,8 @@ def get_variable(str):
             after.append(i)
 
     return  "_".join(after)
+
+
 
 
 class ReadCofig(object):
@@ -114,7 +119,7 @@ class ReadCofig(object):
         return dir
 
 
-
+get_variable("{asd}_qw_{zxc}")
 
 # ana = ReadCofig()
 # a = ana.get_step_message("asset", "Model")

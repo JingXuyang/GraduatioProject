@@ -14,8 +14,9 @@ asset:
           - low_mid
           - middle_mid
           - high_mid
+        work_format: mb
 
-        file_name: '{asset_name}_{short_name}_v###.{work_format}'
+        file_name: '{asset_name}_{short_name}_{describtion_item}_v###.{work_format}'
 
     Texture:
         name: Texture
@@ -24,8 +25,9 @@ asset:
           - low_tex
           - middle_tex
           - high_tex
+        work_format: mb
         
-        file_name: '{asset_name}_{short_name}_v###.{work_format}'
+        file_name: '{asset_name}_{short_name}_{describtion_item}_v###.{work_format}'
         
     Rig:
         name: Rig
@@ -34,8 +36,9 @@ asset:
           - low_rig
           - middle_rig
           - high_rig
+        work_format: mb
         
-        file_name: '{asset_name}_{short_name}_v###.{work_format}'
+        file_name: '{asset_name}_{short_name}_{describtion_item}_v###.{work_format}'
 
 shot:
     Layout:
@@ -45,8 +48,9 @@ shot:
           - low
           - middle
           - high
+        work_format: mb
         
-        file_name: '{sequence}_{shot}_{short_name}_v###.{work_format}'
+        file_name: '{sequence}_{shot}_{short_name}_{describtion_item}_v###.{work_format}'
         
     Animation:
         name: Animation
@@ -55,28 +59,31 @@ shot:
           - SPL
           - BLO
           - POL
+        work_format: mb
         
-        file_name: '{sequence}_{shot}_{short_name}_v###.{work_format}'
+        file_name: '{sequence}_{shot}_{short_name}_{describtion_item}_v###.{work_format}'
         
-    charEffect:
+    CharEffect:
         name: charEffect
         short_name: cf
         describtion_item: 
           - low
           - middle
           - high
+        work_format: mb
         
-        file_name: '{sequence}_{shot}_{short_name}_v###.{work_format}'
+        file_name: '{sequence}_{shot}_{short_name}_{describtion_item}_v###.{work_format}'
 
-    sceneEffect:
+    SceneEffect:
         name: sceneEffect
         short_name: sf
         describtion_item: 
           - low
           - middle
           - high
+        work_format: mb
         
-        file_name: '{sequence}_{shot}_{short_name}_v###.{work_format}'
+        file_name: '{sequence}_{shot}_{short_name}_{describtion_item}_v###.{work_format}'
 
     Light:
         name: Light
@@ -85,5 +92,6 @@ shot:
           - low
           - middle
           - high
+        work_format: mb
         
-        file_name: '{sequence}_{shot}_{short_name}_v###.{work_format}'
+        file_name: '{sequence}_{shot}_{short_name}_{describtion_item}_v###.{work_format}'

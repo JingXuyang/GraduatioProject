@@ -37,6 +37,15 @@ def tree_item(path):
     folder = gf.get_folders(path)
     return folder
 
+class InfoWin(QtGui.QDialog):
+    def __init__(self, message, parent=None):
+        super(InfoWin, self).__init__(parent)
+        self.mes = message
+        self._ui()
+
+    def _ui(self):
+        QtGui.QMessageBox.information(self, "Tip", self.mes, QtGui.QMessageBox.Yes)
+
 
 class AssetWin(QtGui.QWidget):
     def __init__(self, parent=None):
@@ -369,7 +378,7 @@ class SaveWidget(QtGui.QTabWidget):
     def __init__(self, parent=None):
         super(SaveWidget, self).__init__(parent)
         self.setWindowTitle("Save")
-        self.resize(700, 600)
+        self.resize(700, 400)
         self._ui()
 
     def _ui(self):
@@ -420,16 +429,22 @@ class SaveWidget(QtGui.QTabWidget):
                     self.clearLayout(item.layout())
 
     def next(self):
-        subwin = SubWin("asset", self.tab1.asset_win.currentItem().text(1))
-        # 子窗口不关闭无法操作父窗口
-        subwin.setWindowModality(QtCore.Qt.ApplicationModal)
-        subwin.exec_()
+        try:
+            subwin = SubWin("asset", self.tab1.asset_win.currentItem().text(1))
+            # 子窗口不关闭无法操作父窗口
+            subwin.setWindowModality(QtCore.Qt.ApplicationModal)
+            subwin.exec_()
+        except:
+            InfoWin(u"请选择相应的环节保存")
 
     def next1(self):
-        subwin = SubWin("shot", self.tab2.shot_win.currentItem().text(0))
-        # 子窗口不关闭无法操作父窗口
-        subwin.setWindowModality(QtCore.Qt.ApplicationModal)
-        subwin.exec_()
+        try:
+            subwin = SubWin("shot", self.tab2.shot_win.currentItem().text(0))
+            # 子窗口不关闭无法操作父窗口
+            subwin.setWindowModality(QtCore.Qt.ApplicationModal)
+            subwin.exec_()
+        except:
+            InfoWin(u"请选择相应的环节保存")
 
 class SubWin(QtGui.QDialog):
     def __init__(self, AorS, step, parent=None):
@@ -485,6 +500,11 @@ class SubWin(QtGui.QDialog):
         print self.des_win.toPlainText()
         print self.des_com.currentText()
 
+        cache = {}
+        cache["description"] = self.des_win.toPlainText()
+
+
+        self.close()
 
 
 
