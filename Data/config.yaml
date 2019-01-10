@@ -11,44 +11,79 @@ asset:
         name: Model
         short_name: model
         describtion_item: 
-          - low
-          - middle
-          - high
+          - low_mid
+          - middle_mid
+          - high_mid
 
         file_name: '{asset_name}_{short_name}_v###.{work_format}'
 
     Texture:
         name: Texture
         short_name: tex
+        describtion_item: 
+          - low_tex
+          - middle_tex
+          - high_tex
+        
         file_name: '{asset_name}_{short_name}_v###.{work_format}'
         
     Rig:
         name: Rig
         short_name: rig
+        describtion_item: 
+          - low_rig
+          - middle_rig
+          - high_rig
+        
         file_name: '{asset_name}_{short_name}_v###.{work_format}'
 
 shot:
     Layout:
         name: Layout
         short_name: lay
+        describtion_item: 
+          - low
+          - middle
+          - high
+        
         file_name: '{sequence}_{shot}_{short_name}_v###.{work_format}'
         
     Animation:
         name: Animation
         short_name: ani
+        describtion_item: 
+          - SPL
+          - BLO
+          - POL
+        
         file_name: '{sequence}_{shot}_{short_name}_v###.{work_format}'
         
     charEffect:
         name: charEffect
         short_name: cf
+        describtion_item: 
+          - low
+          - middle
+          - high
+        
         file_name: '{sequence}_{shot}_{short_name}_v###.{work_format}'
 
     sceneEffect:
         name: sceneEffect
         short_name: sf
+        describtion_item: 
+          - low
+          - middle
+          - high
+        
         file_name: '{sequence}_{shot}_{short_name}_v###.{work_format}'
 
     Light:
         name: Light
         short_name: lig
+        describtion_item: 
+          - low
+          - middle
+          - high
+        
         file_name: '{sequence}_{shot}_{short_name}_v###.{work_format}'

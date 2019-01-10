@@ -2,6 +2,7 @@
 # -*- coding: utf-8 -*-
 #
 
+import sys
 from PySide import QtGui
 from PySide import QtCore
 from pprint import pprint
@@ -10,14 +11,26 @@ from Data import analysis
 from Action import action
 
 # Global Value
-
 gf = action.OS()
 config_data = analysis.ReadCofig()
 file_mes = action.FileMessage()
 pro_path = config_data.get_global()['project_path']
 asset_step = config_data.allSteps('asset')
 shot_step = config_data.allSteps('shot')
-# print config_data.get_step_message("asset", "Animation")
+
+def get_step_message(AorS, step):
+    '''
+    
+    :param AorS: 输入"asset"或者"shot"
+    :param step: 环节
+    :return: 
+    {
+    'file_name': '{sequence}_{shot}_{short_name}_v###.{work_format}', 
+    'name': 'charEffect', 
+    'short_name': 'cf'
+    }
+    '''
+    return config_data.get_step_message(AorS, step)
 
 
 def tree_item(path):
@@ -76,10 +89,13 @@ class AssetWin(QtGui.QWidget):
         open = QtGui.QPushButton(u"打开")
 
         # ------------------ 布局 -------------------
-        mid = QtGui.QHBoxLayout()
-        mid.addWidget(self.lab)
-        mid.addStretch()
-        mid.addWidget(self.asset_search)
+        self.mid = QtGui.QHBoxLayout()
+        self.mid.addWidget(self.lab)
+        self.mid.addStretch()
+        self.mid.addWidget(self.asset_search)
+
+        self.mid1 = QtGui.QVBoxLayout()
+        self.mid1.addWidget(self.file_win)
 
         self.bottom = QtGui.QHBoxLayout()
         self.bottom.addStretch()
@@ -88,10 +104,10 @@ class AssetWin(QtGui.QWidget):
         self.bottom.addWidget(open)
 
         lay = QtGui.QVBoxLayout()
-        lay.setSpacing(0)
+        lay.setSpacing(3)
         lay.addWidget(self.asset_win)
-        lay.addLayout(mid)
-        lay.addWidget(self.file_win)
+        lay.addLayout(self.mid)
+        lay.addLayout(self.mid1)
         lay.addLayout(self.bottom)
 
         self.setLayout(lay)
@@ -125,41 +141,43 @@ class AssetWin(QtGui.QWidget):
         '''
         添加文件详细信息
         '''
-        self.file_win.clear()
-        work_root = QtGui.QTreeWidgetItem(self.file_win)
-        work_root.setText(0, "Work")
-        approve_root = QtGui.QTreeWidgetItem(self.file_win)
-        approve_root.setText(0, "Approve")
-        # 点击子节点
-        if not item.childCount():
-            par = self.asset_win.currentItem().parent().text(0)
+        try:
+            self.file_win.clear()
+            work_root = QtGui.QTreeWidgetItem(self.file_win)
+            work_root.setText(0, "Work")
+            approve_root = QtGui.QTreeWidgetItem(self.file_win)
+            approve_root.setText(0, "Approve")
+            # 点击子节点
+            if not item.childCount():
+                par = self.asset_win.currentItem().parent().text(0)
 
-            # work 下的子节点
-            work_set = (config_data.get_global()['project_path'], "Assets", par,
-                        self.asset_win.currentItem().text(0), self.asset_win.currentItem().text(1), "Work")
-            work_path = "/".join(work_set)
-            file_ls = gf.get_files(work_path)
-            root = QtGui.QTreeWidgetItem(work_root)
-            for i in file_ls:
-                fl_path = work_path + "/" + i
-                root.setText(0, gf.get_basename(fl_path))
-                root.setText(3, file_mes.get_FileModifyTime(fl_path))
-                root.setText(4, file_mes.get_FileSize(fl_path))
-                root.setText(5, fl_path)
+                # work 下的子节点
+                work_set = (config_data.get_global()['project_path'], "Assets", par,
+                            self.asset_win.currentItem().text(0), self.asset_win.currentItem().text(1), "Work")
+                work_path = "/".join(work_set)
+                file_ls = gf.get_files(work_path)
+                root = QtGui.QTreeWidgetItem(work_root)
+                for i in file_ls:
+                    fl_path = work_path + "/" + i
+                    root.setText(0, gf.get_basename(fl_path))
+                    root.setText(3, file_mes.get_FileModifyTime(fl_path))
+                    root.setText(4, file_mes.get_FileSize(fl_path))
+                    root.setText(5, fl_path)
 
-            # approve 下的子节点
-            approve_set = (config_data.get_global()['project_path'], "Assets", par,
-                           self.asset_win.currentItem().text(0), self.asset_win.currentItem().text(1), "Approve")
-            approve_path = "/".join(approve_set)
-            file_ls = gf.get_files(approve_path)
-            for i in file_ls:
-                fl_path = approve_path+"/"+i
-                root = QtGui.QTreeWidgetItem(approve_root)
-                root.setText(0, gf.get_basename(fl_path))
-                root.setText(3, file_mes.get_FileModifyTime(fl_path))
-                root.setText(4, file_mes.get_FileSize(fl_path))
-                root.setText(5, fl_path)
-
+                # approve 下的子节点
+                approve_set = (config_data.get_global()['project_path'], "Assets", par,
+                               self.asset_win.currentItem().text(0), self.asset_win.currentItem().text(1), "Approve")
+                approve_path = "/".join(approve_set)
+                file_ls = gf.get_files(approve_path)
+                for i in file_ls:
+                    fl_path = approve_path+"/"+i
+                    root = QtGui.QTreeWidgetItem(approve_root)
+                    root.setText(0, gf.get_basename(fl_path))
+                    root.setText(3, file_mes.get_FileModifyTime(fl_path))
+                    root.setText(4, file_mes.get_FileSize(fl_path))
+                    root.setText(5, fl_path)
+        except:
+            pass
     def input(self):
         if self.file_win:
             print self.file_win.currentItem().text(5)
@@ -222,10 +240,13 @@ class ShotWin(QtGui.QWidget):
         open = QtGui.QPushButton(u"打开")
 
         # ------------------ 布局 -------------------
-        mid = QtGui.QHBoxLayout()
-        mid.addWidget(self.lab)
-        mid.addStretch()
-        mid.addWidget(self.asset_search)
+        self.mid = QtGui.QHBoxLayout()
+        self.mid.addWidget(self.lab)
+        self.mid.addStretch()
+        self.mid.addWidget(self.asset_search)
+
+        self.mid1 = QtGui.QVBoxLayout()
+        self.mid1.addWidget(self.file_win)
 
         self.bottom = QtGui.QHBoxLayout()
         self.bottom.addStretch()
@@ -234,9 +255,10 @@ class ShotWin(QtGui.QWidget):
         self.bottom.addWidget(open)
 
         lay = QtGui.QVBoxLayout()
-        lay.setSpacing(0)
+        lay.setSpacing(3)
         lay.addWidget(self.shot_win)
-        lay.addLayout(mid)
+        lay.addLayout(self.mid)
+        lay.addLayout(self.mid1)
         lay.addWidget(self.file_win)
         lay.addLayout(self.bottom)
 
@@ -265,6 +287,7 @@ class ShotWin(QtGui.QWidget):
         '''
         item.takeChildren()
 
+        # root_ls 选中层级的所有父级的列表
         self.root_ls = [pro_path]
         self.get_root(item)
         child = tree_item("/".join(self.root_ls))
@@ -283,36 +306,39 @@ class ShotWin(QtGui.QWidget):
         '''
         添加文件详细信息
         '''
-        self.file_win.clear()
-        work_root = QtGui.QTreeWidgetItem(self.file_win)
-        work_root.setText(0, "Work")
-        approve_root = QtGui.QTreeWidgetItem(self.file_win)
-        approve_root.setText(0, "Approve")
-        # 点击子节点
-        if not item.childCount():
-            # work 下的子节点
-            work_set = ("/".join(self.root_ls), self.shot_win.currentItem().text(0), "Work")
-            work_path = "/".join(work_set)
-            file_ls = gf.get_files(work_path)
-            root = QtGui.QTreeWidgetItem(work_root)
-            for i in file_ls:
-                fl_path = work_path + "/" + i
-                root.setText(0, gf.get_basename(fl_path))
-                root.setText(3, file_mes.get_FileModifyTime(fl_path))
-                root.setText(4, file_mes.get_FileSize(fl_path))
-                root.setText(5, fl_path)
+        try:
+            self.file_win.clear()
+            work_root = QtGui.QTreeWidgetItem(self.file_win)
+            work_root.setText(0, "Work")
+            approve_root = QtGui.QTreeWidgetItem(self.file_win)
+            approve_root.setText(0, "Approve")
+            # 点击子节点
+            if not item.childCount():
+                # work 下的子节点
+                work_set = ("/".join(self.root_ls), self.shot_win.currentItem().text(0), "Work")
+                work_path = "/".join(work_set)
+                file_ls = gf.get_files(work_path)
+                root = QtGui.QTreeWidgetItem(work_root)
+                for i in file_ls:
+                    fl_path = work_path + "/" + i
+                    root.setText(0, gf.get_basename(fl_path))
+                    root.setText(3, file_mes.get_FileModifyTime(fl_path))
+                    root.setText(4, file_mes.get_FileSize(fl_path))
+                    root.setText(5, fl_path)
 
-            # approve 下的子节点
-            approve_set = ("/".join(self.root_ls), self.shot_win.currentItem().text(0), "Approve")
-            approve_path = "/".join(approve_set)
-            file_ls = gf.get_files(approve_path)
-            for i in file_ls:
-                root = QtGui.QTreeWidgetItem(approve_root)
-                fl_path = approve_path+"/"+i
-                root.setText(0, gf.get_basename(fl_path))
-                root.setText(3, file_mes.get_FileModifyTime(fl_path))
-                root.setText(4, file_mes.get_FileSize(fl_path))
-                root.setText(5, fl_path)
+                # approve 下的子节点
+                approve_set = ("/".join(self.root_ls), self.shot_win.currentItem().text(0), "Approve")
+                approve_path = "/".join(approve_set)
+                file_ls = gf.get_files(approve_path)
+                for i in file_ls:
+                    root = QtGui.QTreeWidgetItem(approve_root)
+                    fl_path = approve_path+"/"+i
+                    root.setText(0, gf.get_basename(fl_path))
+                    root.setText(3, file_mes.get_FileModifyTime(fl_path))
+                    root.setText(4, file_mes.get_FileSize(fl_path))
+                    root.setText(5, fl_path)
+        except:
+            pass
 
     def input(self):
         if self.file_win:
@@ -324,7 +350,7 @@ class OpenWidget(QtGui.QTabWidget):
     def __init__(self, parent=None):
         super(OpenWidget, self).__init__(parent)
         self.setWindowTitle("Open")
-        self.resize(700, 600)
+        self.resize(700, 650)
         self._ui()
 
     def _ui(self):
@@ -351,16 +377,22 @@ class SaveWidget(QtGui.QTabWidget):
         # ------------------主界面 -------------------
 
         self.tab1 = AssetWin()
+        self.clearLayout(self.tab1.mid)
+        self.clearLayout(self.tab1.mid1)
         self.clearLayout(self.tab1.bottom)
-        saveBtn = QtGui.QPushButton(u"保存")
+
+        saveBtn = QtGui.QPushButton(u"下一步")
         lay = QtGui.QHBoxLayout()
         lay.addStretch()
         lay.addWidget(saveBtn)
         self.tab1.layout().insertLayout(4, lay)
 
         self.tab2 = ShotWin()
+        self.clearLayout(self.tab2.mid)
+        self.clearLayout(self.tab2.mid1)
         self.clearLayout(self.tab2.bottom)
-        saveBtn1 = QtGui.QPushButton(u"保存")
+
+        saveBtn1 = QtGui.QPushButton(u"下一步")
         lay1 = QtGui.QHBoxLayout()
         lay1.addStretch()
         lay1.addWidget(saveBtn1)
@@ -368,6 +400,9 @@ class SaveWidget(QtGui.QTabWidget):
 
         self.addTab(self.tab1, u"资产")
         self.addTab(self.tab2, u"镜头")
+
+        saveBtn.clicked.connect(self.next)
+        saveBtn1.clicked.connect(self.next1)
 
     def clearLayout(self, layout):
         '''
@@ -384,11 +419,24 @@ class SaveWidget(QtGui.QTabWidget):
                 else:
                     self.clearLayout(item.layout())
 
-class SubWin(QtGui.QWidget):
-    def __init__(self, step, parent=None):
+    def next(self):
+        subwin = SubWin("asset", self.tab1.asset_win.currentItem().text(1))
+        # 子窗口不关闭无法操作父窗口
+        subwin.setWindowModality(QtCore.Qt.ApplicationModal)
+        subwin.exec_()
+
+    def next1(self):
+        subwin = SubWin("shot", self.tab2.shot_win.currentItem().text(0))
+        # 子窗口不关闭无法操作父窗口
+        subwin.setWindowModality(QtCore.Qt.ApplicationModal)
+        subwin.exec_()
+
+class SubWin(QtGui.QDialog):
+    def __init__(self, AorS, step, parent=None):
         super(SubWin, self).__init__(parent)
-        self.resize(300, 200)
+        self.resize(300, 250)
         self.setWindowTitle(u"提交")
+        self.a_or_s = AorS
         self.step = step
 
         self._ui()
@@ -396,14 +444,16 @@ class SubWin(QtGui.QWidget):
     def _ui(self):
 
         # ------------------ 界面 -------------------
-        self.setWindowTitle(self.step.upper() + "Submit")
+        self.setWindowTitle(self.step.capitalize() + " Submit")
 
         des_lab = QtGui.QLabel(u"描述：")
         self.des_win = QtGui.QTextEdit()
 
         extend_des_lab = QtGui.QLabel(u"文件描述:")
-        des_com = QtGui.QComboBox()
-        des_com.setMinimumWidth(100)
+        self.des_com = QtGui.QComboBox()
+        self.des_com.setMinimumWidth(100)
+        items = get_step_message(self.a_or_s, self.step)["describtion_item"]
+        self.des_com.addItems(items)
 
         sum_butt = QtGui.QPushButton(u"提交")
         sum_butt.setMaximumWidth(50)
@@ -412,7 +462,7 @@ class SubWin(QtGui.QWidget):
 
         lay1 = QtGui.QHBoxLayout()
         lay1.addWidget(extend_des_lab)
-        lay1.addWidget(des_com)
+        lay1.addWidget(self.des_com)
         lay1.addStretch()
 
         lay2 = QtGui.QHBoxLayout()
@@ -430,8 +480,10 @@ class SubWin(QtGui.QWidget):
         # ------------------ 信号 -------------------
         sum_butt.clicked.connect(self.submite)
 
+
     def submite(self):
         print self.des_win.toPlainText()
+        print self.des_com.currentText()
 
 
 

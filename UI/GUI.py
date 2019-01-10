@@ -14,11 +14,11 @@ class Window(QtGui.QDialog):
     def __init__(self, parent=None):
         super(Window, self).__init__(parent)
         self.setWindowTitle("Open")
-        # self.resize(800, 600)
+        self.resize(800, 650)
 
         # 实例化窗口
         # self.assetWin = _UI.OpenWidget()
-        # self.assetWin = _UI.SubWin("Animation")
+        # self.assetWin = _UI.SubWin("shot", "Animation")
         self.assetWin = _UI.SaveWidget()
 
         self._Ui()
@@ -26,6 +26,7 @@ class Window(QtGui.QDialog):
         # **************************** 界面布局 *********************************
     def _Ui(self):
         lay = QtGui.QVBoxLayout()
+        lay.setSpacing(0)
         lay.addWidget(self.assetWin)
 
         self.setLayout(lay)
@@ -33,9 +34,13 @@ class Window(QtGui.QDialog):
         # **************************** 信号与槽 *********************************
 
 
+
 if __name__ == "__main__":
     app = QtGui.QApplication(sys.argv)
-    main = Window()
+    # main = Window()
+    # main = _UI.OpenWidget()
+    main = _UI.SaveWidget()
+    # main = _UI.SubWin("shot", "Animation")
     main.show()
     app.exec_()
 

@@ -9,6 +9,11 @@ yamlname = os.path.join(os.path.dirname(__file__), 'config.yaml').replace("\\", 
 
 
 def get_variable(str):
+    '''
+    
+    :param str: yaml文件中带{}的字符串
+    :return: 返回解析后的正确的值
+    '''
 
     ref_con = ReadCofig()
 
@@ -100,11 +105,11 @@ class ReadCofig(object):
         for seq in self.data:
             if seq == sequence:
                 ls = []
-                for step in self.data[seq]:
+                for stp in self.data[seq]:
                     ls.append(step)
-                    if step == step:
-                        for detail in self.data[seq][step]:
-                            dir[detail] = self.data[seq][step][detail]
+                    if stp == step:
+                        for detail in self.data[seq][stp]:
+                            dir[detail] = self.data[seq][stp][detail]
 
         return dir
 
@@ -112,9 +117,9 @@ class ReadCofig(object):
 
 
 # ana = ReadCofig()
-# # a = ana.get_step_message()
+# a = ana.get_step_message("asset", "Model")
 # # b = ana.allSteps()
 # c = ana.get_global()
-# # print a
+# print a
 # # print b
-# print c
+# # print c
