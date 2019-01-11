@@ -18,6 +18,15 @@ def get_variable(str):
 
     funct_ls =  re.findall(r"{(.*?)}", str)
 
+    for i in funct_ls:
+        if hasattr(ReadCofig, i):
+        # if i == "describtion_item":
+            a = ReadCofig()
+            # eval() 把字符串改为对应的的变量名，例如： eval("a." + i) <=> ReadCofig.i
+            ins = eval("a." + i)
+            print ins("asset", "Model")
+
+
     ref_con = ReadCofig()
 
     state = {}
@@ -94,15 +103,22 @@ class ReadCofig(object):
         ls.sort()
         return ls
 
-    def get_step_message(self, sequence='', step=''):
+    def get_step_message(self, sequence='', step='', fun=""):
         '''
         :sequence :  shot 或者 asset
         :step :  环节
+        :fun :  方法名
         
+        如果没有传入 fun
         return:
          {
          'short_name': model,
          'file_name': test_model_v001.mb
+         }
+        如果传入方法，则返回对应json中的值
+        return :
+         {
+         ['low_mid', 'middle_mid', 'high_mid']
          }
         '''
         dir = {}
@@ -115,14 +131,28 @@ class ReadCofig(object):
                     if stp == step:
                         for detail in self.data[seq][stp]:
                             dir[detail] = self.data[seq][stp][detail]
+        if fun:
+            return dir[fun]
+        else:
+            return dir
 
-        return dir
+    def name(self, sequence='', step=''):
+        return self.get_step_message(sequence, step)['name']
 
+    def short_name(self, sequence='', step=''):
+        return self.get_step_message(sequence, step)['short_name']
 
-get_variable("{asd}_qw_{zxc}")
+    def describtion_item(self, sequence='', step=''):
+        return self.get_step_message(sequence, step)['describtion_item']
+
+    def work_format(self, sequence='', step=''):
+        return self.get_step_message(sequence, step)['work_format']
+
+get_variable("{asset_name}_{short_name}_{describtion_item}_v###.{work_format}")
 
 # ana = ReadCofig()
 # a = ana.get_step_message("asset", "Model")
+# print a
 # # b = ana.allSteps()
 # c = ana.get_global()
 # print a
