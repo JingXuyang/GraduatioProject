@@ -390,6 +390,7 @@ class SaveWidget(QtGui.QTabWidget):
         except:
             InfoWin(u"请选择相应的环节保存")
 
+
 class SubWin(QtGui.QDialog):
     def __init__(self, AorS, step, parent=None):
         super(SubWin, self).__init__(parent)
