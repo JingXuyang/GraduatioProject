@@ -15,7 +15,6 @@ asset:
           - middle_mid
           - high_mid
         work_format: mb
-
         file_name: '{asset_name}_{short_name}_{describtion_item}_v###.{work_format}'
 
     Texture:
@@ -26,7 +25,6 @@ asset:
           - middle_tex
           - high_tex
         work_format: mb
-        
         file_name: '{asset_name}_{short_name}_{describtion_item}_v###.{work_format}'
         
     Rig:
@@ -37,7 +35,6 @@ asset:
           - middle_rig
           - high_rig
         work_format: mb
-        
         file_name: '{asset_name}_{short_name}_{describtion_item}_v###.{work_format}'
 
 shot:
@@ -49,7 +46,6 @@ shot:
           - middle
           - high
         work_format: mb
-        
         file_name: '{sequence}_{shot}_{short_name}_{describtion_item}_v###.{work_format}'
         
     Animation:
@@ -60,7 +56,6 @@ shot:
           - BLO
           - POL
         work_format: mb
-        
         file_name: '{sequence}_{shot}_{short_name}_{describtion_item}_v###.{work_format}'
         
     CharEffect:
@@ -71,7 +66,6 @@ shot:
           - middle
           - high
         work_format: mb
-        
         file_name: '{sequence}_{shot}_{short_name}_{describtion_item}_v###.{work_format}'
 
     SceneEffect:
@@ -82,7 +76,6 @@ shot:
           - middle
           - high
         work_format: mb
-        
         file_name: '{sequence}_{shot}_{short_name}_{describtion_item}_v###.{work_format}'
 
     Light:
@@ -93,5 +86,4 @@ shot:
           - middle
           - high
         work_format: mb
-        
         file_name: '{sequence}_{shot}_{short_name}_{describtion_item}_v###.{work_format}'

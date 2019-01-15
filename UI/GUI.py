@@ -17,9 +17,9 @@ class Window(QtGui.QDialog):
         # self.resize(800, 650)
 
         # 实例化窗口
-        # self.assetWin = _UI.OpenWidget()
+        self.assetWin = _UI.OpenWidget()
         # self.assetWin = _UI.SubWin("shot", "Animation")
-        self.assetWin = _UI.SaveWidget()
+        # self.assetWin = _UI.SaveWidget()
 
         self._Ui()
 

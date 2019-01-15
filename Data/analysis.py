@@ -16,13 +16,14 @@ def get_variable(str):
     :return: 返回解析后的正确的值
     '''
 
+    print str
     funct_ls =  re.findall(r"{(.*?)}", str)
 
     for i in funct_ls:
         if hasattr(ReadCofig, i):
         # if i == "describtion_item":
             a = ReadCofig()
-            # eval() 把字符串改为对应的的变量名，例如： eval("a." + i) <=> ReadCofig.i
+            # eval() 把字符串改为对应的的变量名，例如：eval("a." + i) <=> ReadCofig.i
             ins = eval("a." + i)
             print ins("asset", "Model")
 
