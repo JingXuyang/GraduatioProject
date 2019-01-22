@@ -10,6 +10,11 @@ from pprint import pprint
 
 from Data import analysis
 from Action import action
+import UI.qss.Utils as qss
+
+
+button_style_list = ['MediumGray', 'DarkGray', 'BlueJeans', 'Aqua',
+                     'Mint', 'Grass', 'Sunflower', 'Bittersweet', 'Grapefruit', 'Lavender', 'PinkRose']
 
 class TreeWidget(QtGui.QTreeWidget):
     def __init__(self, parent=None):
@@ -59,3 +64,17 @@ class TreeWidget(QtGui.QTreeWidget):
         else:
             root = QtGui.QTreeWidgetItem(item)
             root.setText(1, "")
+
+
+class PushButton(QtGui.QPushButton):
+    def __init__(self, name, parent=None):
+        super(PushButton, self).__init__(parent)
+
+        qss.load_style(self)
+
+        # button style
+        qss.button_style(self, "BlueJeans")
+
+        self.setText(name)
+        self.setMinimumWidth(45)
+        self.setMinimumHeight(25)

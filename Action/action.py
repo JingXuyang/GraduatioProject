@@ -32,7 +32,7 @@ def get_variable(str):
             a = ReadCofig()
             # eval() 把字符串改为对应的的变量名，例如：eval("a." + i) <=> ReadCofig.i
             ins = eval("a." + i)
-            print ins("asset", "Model")
+            # print ins("asset", "Model")
 
     ref_con = ReadCofig()
 

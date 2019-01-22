@@ -13,6 +13,11 @@ import _UI
 class Window(QtGui.QDialog):
     def __init__(self, parent=None):
         super(Window, self).__init__(parent)
+
+
+        # with open("%s/qss/Style.css" % os.path.dirname(__file__).replace("\\", "/"), "r") as f:
+        #     self.setStyleSheet(f.read())
+
         self.setWindowTitle("Open")
         # self.resize(800, 650)
 
@@ -38,8 +43,8 @@ class Window(QtGui.QDialog):
 if __name__ == "__main__":
     app = QtGui.QApplication(sys.argv)
     # main = Window()
-    # main = _UI.OpenWidget()
-    main = _UI.SaveWidget()
+    main = _UI.OpenWidget()
+    # main = _UI.SaveWidget()
     # main = _UI.SubWin("shot", "Animation")
     main.show()
     app.exec_()

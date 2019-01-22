@@ -2,12 +2,13 @@
 # -*- coding: utf-8 -*-
 #
 
-import sys
+import os
 from PySide import QtGui
 from PySide import QtCore
 from pprint import pprint
 from Action import action
 from Main import _widgets
+from UI.qss.Utils import *
 
 ##################### Global Value #####################
 OS = action.OS()
@@ -68,9 +69,9 @@ class BasicWin(QtGui.QDialog):
         tabwin.addTab(self.file_win1, 'Approved')
 
         # ------------------ 底部部分 -------------------
-        input = QtGui.QPushButton(u"导入")
-        refer = QtGui.QPushButton(u"参考")
-        open = QtGui.QPushButton(u"打开")
+        input = _widgets.PushButton(u"导入")
+        refer = _widgets.PushButton(u"参考")
+        open = _widgets.PushButton(u"打开")
 
         # ------------------ 布局 -------------------
         self.mid = QtGui.QHBoxLayout()
@@ -302,6 +303,9 @@ class OpenWidget(QtGui.QTabWidget):
         super(OpenWidget, self).__init__(parent)
         self.setWindowTitle("Open")
         self.resize(700, 650)
+
+        # table_style(self)
+
         self._ui()
 
     def _ui(self):
@@ -332,7 +336,7 @@ class SaveWidget(QtGui.QTabWidget):
         self.clearLayout(self.tab1.asset_win.mid1)
         self.clearLayout(self.tab1.asset_win.bottom)
 
-        saveBtn = QtGui.QPushButton(u"下一步")
+        saveBtn = _widgets.PushButton(u"下一步")
         lay = QtGui.QHBoxLayout()
         lay.addStretch()
         lay.addWidget(saveBtn)
@@ -344,7 +348,7 @@ class SaveWidget(QtGui.QTabWidget):
         self.clearLayout(self.tab2.shot_win.mid1)
         self.clearLayout(self.tab2.shot_win.bottom)
 
-        saveBtn1 = QtGui.QPushButton(u"下一步")
+        saveBtn1 = _widgets.PushButton(u"下一步")
         lay1 = QtGui.QHBoxLayout()
         lay1.addStretch()
         lay1.addWidget(saveBtn1)
@@ -415,7 +419,7 @@ class SubWin(QtGui.QDialog):
         items = ConfigData.get_step_message(self.a_or_s, self.step)["describtion_item"]
         self.des_com.addItems(items)
 
-        sum_butt = QtGui.QPushButton(u"提交")
+        sum_butt = _widgets.PushButton(u"提交")
         sum_butt.setMaximumWidth(50)
 
         # ------------------ 布局 -------------------
