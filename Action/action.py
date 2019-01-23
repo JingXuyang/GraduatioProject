@@ -118,6 +118,18 @@ class OS(object):
             return os.path.basename(path).split(".")[0]
         else:
             return ""
+
+    def get_filetype(self, path):
+        '''
+
+        :param path: 路径
+        :return: 文件扩展名
+        '''
+        if os.path.exists(path):
+            return os.path.basename(path).split(".")[1]
+        else:
+            return ""
+
 # a = OS()
 # print a.get_files(r"D:/JXY_Work/GraduatioProject/project/WSF_CG01/Sequences/Seq01/Shot001/Animation/Approve")
 

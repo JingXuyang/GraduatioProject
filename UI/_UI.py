@@ -165,8 +165,8 @@ class AssetWin(QtGui.QDialog):
                             self.folder_win.currentItem().text(0), self.folder_win.currentItem().text(1), "Work")
                 work_path = "/".join(work_set)
                 file_ls = OS.get_files(work_path)
-                root = QtGui.QTreeWidgetItem(self.file_win)
                 for i in file_ls:
+                    root = QtGui.QTreeWidgetItem(self.file_win)
                     fl_path = work_path + "/" + i
                     root.setText(0, OS.get_basename(fl_path))
                     root.setText(3, file_mes.get_FileModifyTime(fl_path))
@@ -177,10 +177,12 @@ class AssetWin(QtGui.QDialog):
                 approve_set = (ConfigData.get_global()['project_path'], "Assets", par,
                                self.folder_win.currentItem().text(0), self.folder_win.currentItem().text(1), "Approve")
                 approve_path = "/".join(approve_set)
+                print approve_path
                 file_ls = OS.get_files(approve_path)
                 for i in file_ls:
-                    fl_path = approve_path+"/"+i
                     root = QtGui.QTreeWidgetItem(self.file_win1)
+                    fl_path = approve_path + "/" + i
+                    print "jxy", fl_path
                     root.setText(0, OS.get_basename(fl_path))
                     root.setText(3, file_mes.get_FileModifyTime(fl_path))
                     root.setText(4, file_mes.get_FileSize(fl_path))

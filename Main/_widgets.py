@@ -16,6 +16,12 @@ import UI.qss.Utils as qss
 button_style_list = ['MediumGray', 'DarkGray', 'BlueJeans', 'Aqua',
                      'Mint', 'Grass', 'Sunflower', 'Bittersweet', 'Grapefruit', 'Lavender', 'PinkRose']
 
+class Widget(QtGui.QWidget):
+    def __init__(self, parent = None):
+        super(Widget, self).__init__(parent)
+
+
+
 class TreeWidget(QtGui.QTreeWidget):
     def __init__(self, parent=None):
         super(TreeWidget, self).__init__(parent)
@@ -73,7 +79,7 @@ class PushButton(QtGui.QPushButton):
         qss.load_style(self)
 
         # button style
-        qss.button_style(self, "BlueJeans")
+        qss.button_style(self, "Mint")
 
         self.setText(name)
         self.setMinimumWidth(45)
