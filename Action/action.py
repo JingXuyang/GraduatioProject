@@ -18,12 +18,11 @@ CachePath = "C:/Users/" + os.getenv('username') + "/.jxy"
 
 def get_variable(str):
     '''
-
     :param str: yaml文件中带{}的字符串
     :return: 返回解析后的正确的值
     '''
 
-    print str
+    # print str
     funct_ls = re.findall(r"{(.*?)}", str)
 
     for i in funct_ls:
@@ -62,7 +61,6 @@ class OS(object):
 
     def cg_type(self, path):
         '''
-        
         :param path: 路径 
         :return: 如果在FileType中，返回扩展名, 否则为Folse
         '''
@@ -75,7 +73,6 @@ class OS(object):
 
     def get_folders(self, path):
         '''
-        
         :param path: 路径
         :return: 返回path下边所有的文件夹列表
         '''
@@ -92,7 +89,6 @@ class OS(object):
 
     def get_files(self, path):
         '''
-        
         :param path: 路径
         :return: 返回path下边所有的文件列表
         '''
@@ -110,7 +106,6 @@ class OS(object):
 
     def get_basename(self, path):
         '''
-
         :param path: 路径
         :return: 返回文件名
         '''
@@ -121,7 +116,6 @@ class OS(object):
 
     def get_filetype(self, path):
         '''
-
         :param path: 路径
         :return: 文件扩展名
         '''
@@ -144,7 +138,7 @@ class FileMessage(object):
     def get_FileSize(self, filePath):
         fsize = os.path.getsize(filePath)
         fsize1 = fsize / float(1024 * 1024)
-        print fsize
+        # print fsize
         if fsize1 > 1:
             return str(round(fsize1, 1)) + "MB"
         else:
@@ -161,7 +155,6 @@ class CacheInfo(object):
 
     def read_json(self, path):
         '''
-        
         :param path: json 文件路径
         :return: 返回json内容 
         '''
@@ -170,7 +163,6 @@ class CacheInfo(object):
 
     def write_json(self, info, path, filename):
         '''
-        
         :param info: 需要写入的文件信息，写入到
         :param filename: json文件名
         :return: 返回文件信息
@@ -186,16 +178,14 @@ class CacheInfo(object):
 
 
 class ReadCofig(object):
-    def __init__(self):
 
+    def __init__(self):
         self.path = YamlPath
 
         with open(self.path, 'r') as f:
-
             self.data = yaml.load(f.read())
 
     def get_global(self):
-
         dir = {}
         for i in self.data:
             if i == "global":
@@ -205,7 +195,6 @@ class ReadCofig(object):
         return dir
 
     def get_save_path(self):
-
         dir = {}
         for i in self.data:
             if i == "global":

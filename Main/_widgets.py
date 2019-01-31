@@ -51,7 +51,7 @@ class TreeWidget(QtGui.QTreeWidget):
         else:
             return ''
 
-    def addChild(self, item, pro_path, ):
+    def addChild(self, item, pro_path):
         '''
         搜索文件夹添加到资产的item
         '''

@@ -1,5 +1,5 @@
 global:
-    project_path: 'D:/JXY_Work/GraduatioProject/project/WSF_CG01'
+    project_path: 'D:/GraduatioProject/project/WSF_CG01'
     asset_work_path: '{project_path}/Assets/{type}/{asset_name}/{step}/Work/{file_name}'
     asset_approve_path: '{project_path}/Assets/{type}/{asset_name}/{step}/Approve/{file_name}'
     shot_work_path: '{project_path}/Sequences/{seq}/{shot}/{step}/Work/{file_name}'
