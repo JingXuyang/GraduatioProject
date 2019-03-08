@@ -23,7 +23,7 @@ def get_variable(str):
     :return: 返回解析后的正确的值
     '''
 
-    print str
+    # print str
     funct_ls = re.findall(r"{(.*?)}", str)
 
     for i in funct_ls:
@@ -179,7 +179,6 @@ class ReadCofig(object):
         self.path = YamlPath
 
         with open(self.path, 'r') as f:
-
             self.data = yaml.load(f.read())
 
     def get_global(self):
