@@ -5,12 +5,11 @@
 import sys
 from PySide import QtGui
 from PySide import QtCore
-from Action import action
 from pprint import pprint
 
-from Data import analysis
-from Action import action
-import UI.qss.Utils as qss
+# from Data import analysis
+from action import action
+import widget.qss.Utils as qss
 
 
 button_style_list = ['MediumGray', 'DarkGray', 'BlueJeans', 'Aqua',

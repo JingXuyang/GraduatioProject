@@ -6,11 +6,15 @@ import os
 from PySide import QtGui
 from PySide import QtCore
 from pprint import pprint
-from Action import action
-from Main import _widgets
-from UI.qss.Utils import *
+from action import _maya
+
+from action import action
+from main import _widgets
+from widget.qss.Utils import *
 
 ##################### Global Value #####################
+# sw = _maya.Maya()
+
 OS = action.OS()
 ConfigData = action.ReadCofig()
 file_mes = action.FileMessage()
@@ -399,6 +403,11 @@ class SaveWidget(QtGui.QTabWidget):
 
 class SubWin(QtGui.QDialog):
     def __init__(self, AorS, step, parent=None):
+        '''
+        
+        :param AorS: 'asset' or 'shot'
+        :param step: 各个流程环节
+        '''
         super(SubWin, self).__init__(parent)
         self.resize(300, 250)
         self.setWindowTitle(u"提交")

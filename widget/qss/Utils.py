@@ -1,6 +1,4 @@
 # -*- coding:utf-8 -*-
-__author__ = "liaokong"
-__time__ = "2018/10/18 16:20"
 
 import os
 

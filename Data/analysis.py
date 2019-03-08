@@ -81,7 +81,7 @@ class ReadCofig(object):
                 for ii in self.data[i]:
                     if ii == "asset_work_path":
                         dir['asset_work_parh'] = self.data[i][ii]
-                        print get_variable(self.data[i][ii])
+                        # print get_variable(self.data[i][ii])
                     elif ii == "asset_approve_path":
                         dir['asset_approve_path'] = self.data[i][ii]
                     elif ii == "shot_work_path":

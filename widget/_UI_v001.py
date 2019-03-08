@@ -3,7 +3,7 @@ import sys
 sys.path.append("../Action")
 from PyQt4 import QtGui
 from PyQt4 import QtCore
-from Action import action
+from action import action
 
 # Global Value
 PROJECT = "D:/projects/LongGong"

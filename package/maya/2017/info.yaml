@@ -1,0 +1,41 @@
+
+
+############### Env Setup ###########################
+## Env for this package.
+env:
+    - name: MAYA_UI_LANGUAGE
+      value: en_US
+      mode: over
+    
+    - name: MAYA_SCRIPT_PATH
+      value: '{ROOT}/scripts'
+      mode: prefix
+    
+    - name: PYTHONPATH
+      value: '{ROOT}/scripts'
+      mode: prefix
+
+    - name: MAYA_DISABLE_CLICIPM
+      value: "1"
+      mode: over
+
+
+############### Commands ###########################
+exe:
+    win: 'F:/Maya2017/bin/maya.exe'
+    linux: 
+    mac: 
+
+
+############### Tools ###########################
+tools:
+    - name: mayapy
+      label: Maya Python
+      #icon:
+      exe:
+        win: 'F:/Maya2017/bin/mayapy.exe'
+        linux:
+        mac:
+        
+      #scripts:
+
