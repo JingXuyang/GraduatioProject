@@ -233,13 +233,13 @@ class ReadCofig(object):
         如果没有传入 fun
         return:
          {
-         'short_name': model,
-         'file_name': test_model_v001.mb
+             'short_name': model,
+             'file_name': test_model_v001.mb
          }
         如果传入方法，则返回对应json中的值
         return :
          {
-         ['low_mid', 'middle_mid', 'high_mid']
+            ['low_mid', 'middle_mid', 'high_mid']
          }
         '''
         dir = {}
@@ -270,15 +270,7 @@ class ReadCofig(object):
         return self.get_step_message(sequence, step)['work_format']
 
 
+    
 
 
-# get_variable("{asset_name}_{short_name}_{describtion_item}_v###.{work_format}")
 
-# ana = ReadCofig()
-# a = ana.get_step_message("asset", "Model")
-# print a
-# # b = ana.allSteps()
-# c = ana.get_global()
-# print a
-# # print b
-# # print c

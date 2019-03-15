@@ -3,17 +3,23 @@
 #
 
 import sys
-from PySide import QtGui
-from PySide import QtCore
+try:
+    from PySide import QtGui
+    from PySide import QtCore
+except:
+    from PySide2 import QtGui
+    from Pyside2 import QtWidgets as QtGui
+    from PySide2 import QtCore
 from pprint import pprint
 
-# from Data import analysis
 from action import action
 import widget.qss.Utils as qss
 
-
+# 按钮样式
 button_style_list = ['MediumGray', 'DarkGray', 'BlueJeans', 'Aqua',
-                     'Mint', 'Grass', 'Sunflower', 'Bittersweet', 'Grapefruit', 'Lavender', 'PinkRose']
+                     'Mint', 'Grass', 'Sunflower', 'Bittersweet',
+                     'Grapefruit', 'Lavender', 'PinkRose'
+                     ]
 
 class Widget(QtGui.QWidget):
     def __init__(self, parent = None):

@@ -2,13 +2,18 @@
 # -*- coding: utf-8 -*-
 #
 
-import os
 import sys
-sys.path.append(os.path.dirname(os.path.dirname(__file__)))
+# sys.path.append(os.path.dirname(os.path.dirname(__file__)))
 
-from PySide import QtGui
-from PySide import QtCore
-import _UI
+try:
+    from PySide import QtGui
+    from PySide import QtCore
+except:
+    from PySide2 import QtGui
+    from Pyside2 import QtWidgets as QtGui
+    from PySide2 import QtCore
+
+import _ui
 
 class Window(QtGui.QDialog):
     def __init__(self, parent=None):
@@ -18,14 +23,14 @@ class Window(QtGui.QDialog):
         '''
         打开 open 窗口
         '''
-        win = _UI.OpenWidget()
+        win = _ui.OpenWidget()
         win.show()
 
     def save(self):
         '''
         打开 save as 窗口
         '''
-        win = _UI.SaveWidget()
+        win = _ui.SaveWidget()
         win.show()
 
 
@@ -36,8 +41,8 @@ class Window(QtGui.QDialog):
 if __name__ == "__main__":
     app = QtGui.QApplication(sys.argv)
     # main = Window()
-    # main = _UI.OpenWidget()
-    main = _UI.SaveWidget()
+    main = _ui.OpenWidget()
+    # main = _ui.SaveWidget()
     # main = _UI.SubWin("shot", "Animation")
     main.show()
     app.exec_()

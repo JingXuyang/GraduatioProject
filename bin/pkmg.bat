@@ -11,9 +11,6 @@ set PROJECT_ROOT_PATH=C:\projects
 
 cd /d %CURRENT_DIR%
 
-rem set DATABASE=Json
-rem set DATABASE=Csv
-rem set DATABASE=Shotgun
 set DATABASE=CGTeamwork
 rem set DATABASE=LocalCGTeamwork
 

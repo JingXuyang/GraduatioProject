@@ -3,13 +3,18 @@
 #
 
 import os
-from PySide import QtGui
-from PySide import QtCore
+try:
+    from PySide import QtGui
+    from PySide import QtCore
+except:
+    from PySide2 import QtGui
+    from Pyside2 import QtWidgets as QtGui
+    from PySide2 import QtCore
 from pprint import pprint
 from action import _maya
 
 from action import action
-from main import _widgets
+from main.widgets import _widgets
 from widget.qss.Utils import *
 
 ##################### Global Value #####################
@@ -317,7 +322,6 @@ class OpenWidget(QtGui.QTabWidget):
     def _ui(self):
 
         # ------------------主界面 -------------------
-
         self.tab1 = AssetWin()
         self.tab2 = ShotWin()
 
@@ -336,7 +340,6 @@ class SaveWidget(QtGui.QTabWidget):
     def _ui(self):
 
         # ------------------主界面 -------------------
-
         self.tab1 = AssetWin()
         self.clearLayout(self.tab1.asset_win.mid)
         self.clearLayout(self.tab1.asset_win.mid1)
