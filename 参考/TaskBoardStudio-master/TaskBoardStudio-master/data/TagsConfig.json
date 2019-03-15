@@ -1,0 +1,14 @@
+[
+  {
+    "tag_name": "不紧急",
+    "color": "#a0d468"
+  },
+  {
+    "tag_name": "相对紧急",
+    "color": "#ffce54"
+  },
+  {
+    "tag_name": "紧急",
+    "color": "#ed5565"
+  }
+]
