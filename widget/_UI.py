@@ -2,7 +2,6 @@
 # -*- coding: utf-8 -*-
 #
 
-import os
 try:
     from PySide import QtGui
     from PySide import QtCore
@@ -10,15 +9,15 @@ except:
     from PySide2 import QtGui
     from Pyside2 import QtWidgets as QtGui
     from PySide2 import QtCore
-from pprint import pprint
-from action import _maya
 
 from action import action
-from main.widgets import _widgets
+from main import _widgets
 from widget.qss.Utils import *
 
 ##################### Global Value #####################
 # sw = _maya.Maya()
+ASSETROOT = ["Character", "Prop", "Set"]
+SEQUENCEROOT = ["Sequences"]
 
 OS = action.OS()
 ConfigData = action.ReadCofig()
@@ -120,8 +119,7 @@ class AssetWin(QtGui.QDialog):
         self.file_win = self.asset_win.file_win
         self.file_win1 = self.asset_win.file_win1
 
-        root_list = ["Character", "Prop", "Set"]
-        for i in root_list:
+        for i in ASSETROOT:
             root = QtGui.QTreeWidgetItem(self.folder_win)
             root.setText(0, i)
             child = QtGui.QTreeWidgetItem(root)
@@ -137,6 +135,13 @@ class AssetWin(QtGui.QDialog):
         self.folder_win.itemClicked.connect(self.click)
         self.folder_win.itemExpanded.connect(self.addChild)
         # input.clicked.connect(self.input)
+
+    def getSelectItem(self, item, row):
+        '''
+
+        :return: 返回选中的item
+        '''
+        return item.text(row)
 
     def addChild(self, item):
         '''
@@ -162,9 +167,11 @@ class AssetWin(QtGui.QDialog):
         '''
         添加文件详细信息
         '''
-        try:
+        if hasattr(self, 'file_win'):
             self.file_win.clear()
+            self.file_win1.clear()
 
+        try:
             # 点击子节点
             if not item.childCount():
                 par = self.folder_win.currentItem().parent().text(0)
@@ -196,9 +203,9 @@ class AssetWin(QtGui.QDialog):
                     root.setText(3, file_mes.get_FileModifyTime(fl_path))
                     root.setText(4, file_mes.get_FileSize(fl_path))
                     root.setText(5, fl_path)
-
         except:
             pass
+
 
     def input(self):
         if self.file_win:
@@ -218,8 +225,7 @@ class ShotWin(QtGui.QWidget):
         self.file_win = self.shot_win.file_win
         self.file_win1 = self.shot_win.file_win1
 
-        root_list = ["Sequences"]
-        for i in root_list:
+        for i in SEQUENCEROOT:
             root = QtGui.QTreeWidgetItem(self.folder_win)
             root.setText(0, i)
             child = QtGui.QTreeWidgetItem(root)
@@ -272,36 +278,37 @@ class ShotWin(QtGui.QWidget):
         '''
         添加文件详细信息
         '''
-        try:
+        if hasattr(self, 'file_win'):
             self.file_win.clear()
+        if hasattr(self, 'file_win1'):
+            self.file_win1.clear()
 
-            # 点击子节点
-            if not item.childCount():
-                # work 下的子节点
-                work_set = ("/".join(self.root_ls), self.folder_win.currentItem().text(0), "Work")
-                work_path = "/".join(work_set)
-                file_ls = OS.get_files(work_path)
-                root = QtGui.QTreeWidgetItem(self.file_win)
-                for i in file_ls:
-                    fl_path = work_path + "/" + i
-                    root.setText(0, OS.get_basename(fl_path))
-                    root.setText(3, file_mes.get_FileModifyTime(fl_path))
-                    root.setText(4, file_mes.get_FileSize(fl_path))
-                    root.setText(5, fl_path)
+        # 点击子节点
+        if not item.childCount():
+            # work 下的子节点
+            work_set = ("/".join(self.root_ls), self.folder_win.currentItem().text(0), "Work")
+            work_path = "/".join(work_set)
+            file_ls = OS.get_files(work_path)
+            root = QtGui.QTreeWidgetItem(self.file_win)
+            for i in file_ls:
+                fl_path = work_path + "/" + i
+                root.setText(0, OS.get_basename(fl_path))
+                root.setText(3, file_mes.get_FileModifyTime(fl_path))
+                root.setText(4, file_mes.get_FileSize(fl_path))
+                root.setText(5, fl_path)
 
-                # approve 下的子节点
-                approve_set = ("/".join(self.root_ls), self.folder_win.currentItem().text(0), "Approve")
-                approve_path = "/".join(approve_set)
-                file_ls = OS.get_files(approve_path)
-                for i in file_ls:
-                    root = QtGui.QTreeWidgetItem(self.file_win1)
-                    fl_path = approve_path+"/"+i
-                    root.setText(0, OS.get_basename(fl_path))
-                    root.setText(3, file_mes.get_FileModifyTime(fl_path))
-                    root.setText(4, file_mes.get_FileSize(fl_path))
-                    root.setText(5, fl_path)
-        except:
-            pass
+            # approve 下的子节点
+            approve_set = ("/".join(self.root_ls), self.folder_win.currentItem().text(0), "Approve")
+            approve_path = "/".join(approve_set)
+            file_ls = OS.get_files(approve_path)
+            for i in file_ls:
+                root = QtGui.QTreeWidgetItem(self.file_win1)
+                fl_path = approve_path+"/"+i
+                root.setText(0, OS.get_basename(fl_path))
+                root.setText(3, file_mes.get_FileModifyTime(fl_path))
+                root.setText(4, file_mes.get_FileSize(fl_path))
+                root.setText(5, fl_path)
+
 
     def input(self):
         if self.file_win:
@@ -468,6 +475,181 @@ class SubWin(QtGui.QDialog):
 
 
         self.close()
+
+
+class CreateAssetWin(QtGui.QDialog):
+
+    def __init__(self, syle_ls=[], asset_ls=[], step_ls=[], parent=None):
+        '''
+
+        :param syle_ls: 资产类型
+        :param asset_ls: 资产列表
+        :param step_ls: 环节列表
+        '''
+        super(CreateAssetWin, self).__init__(parent)
+        self.syle_ls = syle_ls
+        self.asset_ls = asset_ls
+        self.step_ls = step_ls
+
+        self._UI()
+
+    def _UI(self):
+        self.setWindowTitle(u"Create Asset")
+        self.resize(300, 200)
+        lab1 = QtGui.QLabel(u"Asset Style:")
+        lab2 = QtGui.QLabel(u"Asset Name:")
+        lab3 = QtGui.QLabel(u"Step:")
+
+        self.styleComb = _widgets.ComboBox()
+        self.assetComb = _widgets.ComboBox()
+        self.stepComb = _widgets.ComboBox()
+        self.save = _widgets.PushButton("Save")
+        self.cancel = _widgets.PushButton("Cancel")
+
+        # 自动补全下拉菜单
+        self.assetComb.setEditable(True)
+        self.stepComb.setEditable(True)
+
+        # 布局
+        lay1 = QtGui.QHBoxLayout()
+        lay1.addStretch()
+        lay1.addWidget(self.save)
+        lay1.addWidget(self.cancel)
+        lay = QtGui.QGridLayout()
+        lay.addWidget(lab1, 0, 0)
+        lay.addWidget(self.styleComb, 0, 1)
+        lay.addWidget(lab2, 1, 0)
+        lay.addWidget(self.assetComb, 1, 1)
+        lay.addWidget(lab3, 2, 0)
+        lay.addWidget(self.stepComb, 2, 1)
+        lay.addLayout(lay1, 3, 1)
+
+        self.setLayout(lay)
+
+        # 初始化combobox
+        self.init_combobox()
+
+        # 信号
+        self.save.clicked.connect(self.saveCon)
+
+    def init_combobox(self):
+        # 增加选项元素
+        for i in range(len(self.syle_ls)):
+            self.styleComb.addItem(self.syle_ls[i])
+        self.styleComb.setCurrentIndex(-1)
+        for i in range(len(self.asset_ls)):
+            self.assetComb.addItem(self.asset_ls[i])
+        self.assetComb.setCurrentIndex(-1)
+        for i in range(len(self.step_ls)):
+            self.stepComb.addItem(self.step_ls[i])
+        self.stepComb.setCurrentIndex(-1)
+
+        # 增加自动补全
+        completer2 = QtGui.QCompleter(self.asset_ls)
+        self.assetComb.setCompleter(completer2)
+        completer3 = QtGui.QCompleter(self.step_ls)
+        self.stepComb.setCompleter(completer3)
+
+    def saveCon(self):
+        self.item_list.append(self.asseSty.currentText())
+        print self.item_list
+        self.completer.clear()
+        self.completer = QtGui.QCompleter(self.item_list)
+
+
+class AssetDataWin(QtGui.QWidget):
+    def __init__(self, parent=None):
+        super(AssetDataWin, self).__init__(parent)
+
+        self._ui()
+
+    def _ui(self):
+        self.resize(600, 700)
+        self.setWindowTitle('Asset library')
+
+        # --------------------- Asset Widget ---------------------
+        asset_win = BasicWin()
+        self.assetTree = asset_win.folder_win
+
+        for i in ASSETROOT:
+            root = QtGui.QTreeWidgetItem(self.assetTree)
+            root.setText(0, i)
+            child = QtGui.QTreeWidgetItem(root)
+            child.setText(0, "")
+
+        # --------------------- Menu ---------------------
+        '''
+        将ContextMenuPolicy设置为QtGui.CustomContextMenu.
+        否则无法使用customContextMenuRequested信号
+        '''
+        self.setContextMenuPolicy(QtCore.Qt.CustomContextMenu)
+        # 创建QMenu信号事件
+        self.customContextMenuRequested.connect(self.showMenu)
+        self.contextMenu = QtGui.QMenu(self)
+        self.add = self.contextMenu.addAction('Create asset')
+        self.delete = self.contextMenu.addAction('Delete asset')
+        # 二级菜单
+        # self.GN = self.contextMenu.addMenu("功能")
+        # self.ZJ = self.GN.addAction('增加')
+
+        # --------------------- Layout ---------------------
+        lay = QtGui.QVBoxLayout()
+        lay.addWidget(self.assetTree)
+
+        self.setLayout(lay)
+
+        # --------------------- 信号 ---------------------
+        self.par_fun = AssetWin(self)
+        self.assetTree.itemClicked.connect(self.par_fun.click)
+        self.assetTree.itemExpanded.connect(self.par_fun.addChild)
+        # 事件绑定
+        self.add.triggered.connect(self.addAsset)
+        self.delete.triggered.connect(self.delAsset)
+
+    def showMenu(self, pos):
+        '''
+        菜单显示前,将它移动到鼠标点击的位置
+
+        :param pos: 鼠标位置
+        '''
+        if self.assetTree.selectedItems():
+            # print self.assetTree.selectedItems()[0].text(0)
+            self.contextMenu.exec_(QtGui.QCursor.pos())  # 在鼠标位置显示
+        else:
+            print 2
+
+
+    def addAsset(self):
+        '''
+
+        鼠标右键弹出来的添加资产界面
+        '''
+        # 获取所有资产类型
+        for i in self.assetTree.selectedItems():
+            sel = i.text(0)
+        set = (ProjectPath, "Assets", sel)
+        child1 = OS.get_folders("/".join(set))
+
+        # 获取所有的环节
+        child2 = AssetStep
+
+        kwarg = {
+            'syle_ls': ASSETROOT,
+            'asset_ls': child1,
+            'step_ls': child2
+        }
+
+        popwin = CreateAssetWin(**kwarg)
+        popwin.exec_()
+
+
+    def delAsset(self):
+        print AssetStep
+
+
+
+
+
 
 
 
