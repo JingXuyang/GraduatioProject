@@ -479,7 +479,7 @@ class SubWin(QtGui.QDialog):
 
 class CreateAssetWin(QtGui.QDialog):
 
-    def __init__(self, syle_ls=[], asset_ls=[], step_ls=[], parent=None):
+    def __init__(self, style_ls=[], asset_ls=[], step_ls=[], parent=None):
         '''
 
         :param syle_ls: 资产类型
@@ -487,7 +487,7 @@ class CreateAssetWin(QtGui.QDialog):
         :param step_ls: 环节列表
         '''
         super(CreateAssetWin, self).__init__(parent)
-        self.syle_ls = syle_ls
+        self.syle_ls = style_ls
         self.asset_ls = asset_ls
         self.step_ls = step_ls
 
@@ -495,7 +495,7 @@ class CreateAssetWin(QtGui.QDialog):
 
     def _UI(self):
         self.setWindowTitle(u"Create Asset")
-        self.resize(300, 200)
+        self.resize(250, 200)
         lab1 = QtGui.QLabel(u"Asset Style:")
         lab2 = QtGui.QLabel(u"Asset Name:")
         lab3 = QtGui.QLabel(u"Step:")
@@ -508,7 +508,6 @@ class CreateAssetWin(QtGui.QDialog):
 
         # 自动补全下拉菜单
         self.assetComb.setEditable(True)
-        self.stepComb.setEditable(True)
 
         # 布局
         lay1 = QtGui.QHBoxLayout()
@@ -545,17 +544,30 @@ class CreateAssetWin(QtGui.QDialog):
         self.stepComb.setCurrentIndex(-1)
 
         # 增加自动补全
-        completer2 = QtGui.QCompleter(self.asset_ls)
-        self.assetComb.setCompleter(completer2)
-        completer3 = QtGui.QCompleter(self.step_ls)
-        self.stepComb.setCompleter(completer3)
+        self.completer = QtGui.QCompleter(self.asset_ls)
+        self.assetComb.setCompleter(self.completer)
 
     def saveCon(self):
-        self.item_list.append(self.asseSty.currentText())
-        print self.item_list
-        self.completer.clear()
-        self.completer = QtGui.QCompleter(self.item_list)
+        '''
+        保存选项到字典
+        :return:
+        '''
 
+        if self.styleComb.currentText() and self.assetComb.currentText() and self.styleComb.currentText():
+            if self.assetComb.currentText() not in self.asset_ls:
+                self.asset_ls.append(self.assetComb.currentText())
+            self.save_data = {
+                'style_ls': self.styleComb.currentText(),
+                'asset_ls': self.asset_ls,
+                'step_ls': self.stepComb.currentText()
+            }
+            print self.save_data
+            self.close()
+            # self.completer.clear()
+            # self.completer = QtGui.QCompleter(self.save_data['asset_ls'])
+        else:
+            tip = InfoWin('Please check selection')
+            tip.show()
 
 class AssetDataWin(QtGui.QWidget):
     def __init__(self, parent=None):
@@ -624,6 +636,7 @@ class AssetDataWin(QtGui.QWidget):
 
         鼠标右键弹出来的添加资产界面
         '''
+
         # 获取所有资产类型
         for i in self.assetTree.selectedItems():
             sel = i.text(0)
@@ -634,7 +647,7 @@ class AssetDataWin(QtGui.QWidget):
         child2 = AssetStep
 
         kwarg = {
-            'syle_ls': ASSETROOT,
+            'style_ls': ASSETROOT,
             'asset_ls': child1,
             'step_ls': child2
         }
