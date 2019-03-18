@@ -22,7 +22,7 @@ class AddAssetOrShot(QtGui.QWidget):
         lab3 = QtGui.QLabel(u"Step:")
 
         self.asseSty = ()
-        self.assetName = QtGui.QComboBox()
+        self.asseSty = QtGui.QComboBox()
         self.step = QtGui.QComboBox()
         self.save = QtGui.QPushButton("Save")
         self.save.setMaximumWidth(40)
