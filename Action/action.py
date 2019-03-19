@@ -6,6 +6,7 @@ import time
 import json
 import yaml
 import re
+import shutil
 import datetime
 
 # from Data import analysis
@@ -61,6 +62,7 @@ class OS(object):
 
     def cg_type(self, path):
         '''
+
         :param path: 路径 
         :return: 如果在FileType中，返回扩展名, 否则为Folse
         '''
@@ -73,6 +75,7 @@ class OS(object):
 
     def get_folders(self, path):
         '''
+
         :param path: 路径
         :return: 返回path下边所有的文件夹列表
         '''
@@ -89,6 +92,7 @@ class OS(object):
 
     def get_files(self, path):
         '''
+
         :param path: 路径
         :return: 返回path下边所有的文件列表
         '''
@@ -106,6 +110,7 @@ class OS(object):
 
     def get_basename(self, path):
         '''
+
         :param path: 路径
         :return: 返回文件名
         '''
@@ -116,6 +121,7 @@ class OS(object):
 
     def get_filetype(self, path):
         '''
+
         :param path: 路径
         :return: 文件扩展名
         '''
@@ -123,6 +129,28 @@ class OS(object):
             return os.path.basename(path).split(".")[1]
         else:
             return ""
+
+    def makeFolder(self, path):
+        '''
+
+        创建文件夹
+        :param path: 文件夹路径
+        '''
+        folder = os.path.dirname(path)
+        if not os.path.isdir(folder):
+            os.makedirs(folder)
+
+    def copyFile(self, src, dst):
+        '''
+
+        :param src: 源文件
+        :param dst: 目标文件
+        '''
+        src = src.replace('\\', '/')
+        dst = dst.replace('\\', '/')
+        if os.path.exists(src) and src != dst:
+            shutil.copyfile(src, dst)
+
 
 # a = OS()
 # print a.get_files(r"D:/JXY_Work/GraduatioProject/project/WSF_CG01/Sequences/Seq01/Shot001/Animation/Approve")

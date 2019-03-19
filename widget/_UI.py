@@ -549,25 +549,44 @@ class CreateAssetWin(QtGui.QDialog):
 
     def saveCon(self):
         '''
-        保存选项到字典
-        :return:
+        若果创建的资产不存在则创建资产，存在不创建。 返回界面所填的的信息
+        :return: 返回界面选择的字典
         '''
 
-        if self.styleComb.currentText() and self.assetComb.currentText() and self.styleComb.currentText():
-            if self.assetComb.currentText() not in self.asset_ls:
-                self.asset_ls.append(self.assetComb.currentText())
+        if self.styleComb.currentText() and self.assetComb.currentText() and self.stepComb.currentText():
             self.save_data = {
                 'style_ls': self.styleComb.currentText(),
-                'asset_ls': self.asset_ls,
+                'asset_ls': self.assetComb.currentText(),
                 'step_ls': self.stepComb.currentText()
             }
-            print self.save_data
-            self.close()
-            # self.completer.clear()
-            # self.completer = QtGui.QCompleter(self.save_data['asset_ls'])
+
+            work_set = (ProjectPath, "Assets", self.save_data['style_ls'], self.save_data['asset_ls'],
+                        self.save_data['step_ls'], "Work", '')
+            approve_set = (ProjectPath, "Assets", self.save_data['style_ls'], self.save_data['asset_ls'],
+                        self.save_data['step_ls'], "Approve", '')
+            work_path = "/".join(work_set)
+            approve_path = "/".join(approve_set)
+
+            if os.path.exists(work_path) and os.path.exists(approve_path):
+                tip = InfoWin(u"资产已经存在, 无需创建")
+                tip.show()
+                self.styleComb.clear()
+                self.assetComb.clear()
+                self.stepComb.clear()
+
+            else:
+                OS.makeFolder(work_path)
+                OS.makeFolder(approve_path)
+                tip = InfoWin(u"资产创建成功")
+                tip.show()
+                self.close()
+
+            return self.save_data
+
         else:
             tip = InfoWin('Please check selection')
             tip.show()
+
 
 class AssetDataWin(QtGui.QWidget):
     def __init__(self, parent=None):
@@ -627,8 +646,6 @@ class AssetDataWin(QtGui.QWidget):
         if self.assetTree.selectedItems():
             # print self.assetTree.selectedItems()[0].text(0)
             self.contextMenu.exec_(QtGui.QCursor.pos())  # 在鼠标位置显示
-        else:
-            print 2
 
 
     def addAsset(self):
@@ -639,7 +656,11 @@ class AssetDataWin(QtGui.QWidget):
 
         # 获取所有资产类型
         for i in self.assetTree.selectedItems():
-            sel = i.text(0)
+            # 如果选中的是子节点, sel是父级
+            try:
+                sel = i.parent().text(0)
+            except:
+                sel = i.text(0)
         set = (ProjectPath, "Assets", sel)
         child1 = OS.get_folders("/".join(set))
 
