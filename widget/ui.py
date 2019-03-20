@@ -41,8 +41,8 @@ class Window(QtGui.QDialog):
 if __name__ == "__main__":
     app = QtGui.QApplication(sys.argv)
     # main = Window()
-    # main = _ui.AssetDataWin()
-    main = _ui.OpenWidget()
+    main = _ui.AssetDataWin()
+    # main = _ui.OpenWidget()
     # main = _ui.SaveWidget()
     # main = _UI.SubWin("shot", "Animation")
     main.show()
