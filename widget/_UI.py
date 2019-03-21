@@ -11,11 +11,12 @@ except:
     from PySide2 import QtCore
 
 from action import action
+from action import maya
 from main import _widgets
 from widget.qss.Utils import *
 
 ##################### Global Value #####################
-# sw = _maya.Maya()
+SW = maya.Maya()
 ASSETROOT = ["Character", "Prop", "Set"]
 SEQUENCEROOT = ["Sequences"]
 
@@ -29,12 +30,31 @@ ShotStep = ConfigData.allSteps('shot')
 
 class InfoWin(QtGui.QDialog):
     def __init__(self, message, parent=None):
+        '''
+
+        :param message: 提示语
+        '''
         super(InfoWin, self).__init__(parent)
         self.mes = message
         self._ui()
 
     def _ui(self):
         QtGui.QMessageBox.information(self, "Tip", self.mes, QtGui.QMessageBox.Yes)
+
+
+class WarningWin(QtGui.QDialog):
+    def __init__(self, message, parent=None):
+        '''
+
+        :param message: 提示语
+        '''
+        super(WarningWin, self).__init__(parent)
+        self.mes = message
+        self._ui()
+
+    def _ui(self):
+        self.reply = QtGui.QMessageBox.question(self, 'Warning', self.mes,
+                                                QtGui.QMessageBox.Yes|QtGui.QMessageBox.No)
 
 
 class BasicWin(QtGui.QDialog):
@@ -77,9 +97,9 @@ class BasicWin(QtGui.QDialog):
         tabwin.addTab(self.file_win1, 'Approved')
 
         # ------------------ 底部部分 -------------------
-        input = _widgets.PushButton(u"导入")
-        refer = _widgets.PushButton(u"参考")
-        open = _widgets.PushButton(u"打开")
+        self.inputBtn = _widgets.PushButton(u"导入")
+        self.referBtn = _widgets.PushButton(u"参考")
+        self.openBtn = _widgets.PushButton(u"打开")
 
         # ------------------ 布局 -------------------
         self.mid = QtGui.QHBoxLayout()
@@ -92,9 +112,9 @@ class BasicWin(QtGui.QDialog):
 
         self.bottom = QtGui.QHBoxLayout()
         self.bottom.addStretch()
-        self.bottom.addWidget(input)
-        self.bottom.addWidget(refer)
-        self.bottom.addWidget(open)
+        self.bottom.addWidget(self.inputBtn)
+        self.bottom.addWidget(self.referBtn)
+        self.bottom.addWidget(self.openBtn)
 
         lay = QtGui.QVBoxLayout()
         lay.setSpacing(3)
@@ -134,14 +154,8 @@ class AssetWin(QtGui.QDialog):
         # ------------------ 信号与槽 -------------------
         self.folder_win.itemClicked.connect(self.click)
         self.folder_win.itemExpanded.connect(self.addChild)
-        # input.clicked.connect(self.input)
+        self.asset_win.openBtn.clicked.connect(self.openFile)
 
-    def getSelectItem(self, item, row):
-        '''
-
-        :return: 返回选中的item
-        '''
-        return item.text(row)
 
     def addChild(self, item):
         '''
@@ -165,7 +179,7 @@ class AssetWin(QtGui.QDialog):
 
     def click(self, item):
         '''
-        添加文件详细信息
+        展开添加文件详细信息
         '''
         if hasattr(self, 'file_win'):
             self.file_win.clear()
@@ -207,9 +221,49 @@ class AssetWin(QtGui.QDialog):
             pass
 
 
-    def input(self):
-        if self.file_win:
-            print self.file_win.currentItem().text(5)
+    def openFile(self):
+        '''
+        打开选中的文件
+        :return:
+        '''
+
+        if self.file_win.currentItem():
+            path_clm = self.file_win.getHeaderCount(u"路径")
+            # SW.open(self.file_win.currentItem().text(path_clm))
+        elif self.file_win1.currentItem():
+            path_clm = self.file_win1.getHeaderCount(u"路径")
+            # SW.open(self.file_win1.currentItem().text(path_clm))
+        else:
+            InfoWin(u"请选择文件")
+
+    def importFile(self):
+        '''
+        导入选中的文件
+        :return:
+        '''
+        if self.file_win.currentItem():
+            path_clm = self.file_win.getHeaderCount(u"路径")
+            # SW.open(self.file_win.currentItem().text(path_clm))
+        elif self.file_win1.currentItem():
+            path_clm = self.file_win1.getHeaderCount(u"路径")
+            # SW.open(self.file_win1.currentItem().text(path_clm))
+        else:
+            InfoWin(u"请选择文件")
+
+    def referenceFile(self):
+        '''
+        导入选中的文件
+        :return:
+        '''
+        if self.file_win.currentItem():
+            path_clm = self.file_win.getHeaderCount(u"路径")
+            # SW.reference(self.file_win.currentItem().text(path_clm))
+        elif self.file_win1.currentItem():
+            path_clm = self.file_win1.getHeaderCount(u"路径")
+            # SW.reference(self.file_win1.currentItem().text(path_clm))
+        else:
+            InfoWin(u"请选择文件")
+
 
 
 class ShotWin(QtGui.QWidget):
@@ -239,7 +293,7 @@ class ShotWin(QtGui.QWidget):
         # ------------------ 信号与槽 -------------------
         self.folder_win.itemClicked.connect(self.click)
         self.folder_win.itemExpanded.connect(self.addChild)
-        # input.clicked.connect(self.input)
+        self.shot_win.openBtn.clicked.connect(self.openFile)
 
     def get_root(self, item):
         '''
@@ -309,10 +363,48 @@ class ShotWin(QtGui.QWidget):
                 root.setText(4, file_mes.get_FileSize(fl_path))
                 root.setText(5, fl_path)
 
+    def openFile(self):
+        '''
+        打开选中的文件
+        :return:
+        '''
 
-    def input(self):
-        if self.file_win:
-            print self.file_win.currentItem().text(5)
+        if self.file_win.currentItem():
+            path_clm = self.file_win.getHeaderCount(u"路径")
+            # SW.open(self.file_win.currentItem().text(path_clm))
+        elif self.file_win1.currentItem():
+            path_clm = self.file_win1.getHeaderCount(u"路径")
+            # SW.open(self.file_win1.currentItem().text(path_clm))
+        else:
+            InfoWin(u"请选择文件")
+
+    def importFile(self):
+        '''
+        导入选中的文件
+        :return:
+        '''
+        if self.file_win.currentItem():
+            path_clm = self.file_win.getHeaderCount(u"路径")
+            # SW.open(self.file_win.currentItem().text(path_clm))
+        elif self.file_win1.currentItem():
+            path_clm = self.file_win1.getHeaderCount(u"路径")
+            # SW.open(self.file_win1.currentItem().text(path_clm))
+        else:
+            InfoWin(u"请选择文件")
+
+    def referenceFile(self):
+        '''
+        导入选中的文件
+        :return:
+        '''
+        if self.file_win.currentItem():
+            path_clm = self.file_win.getHeaderCount(u"路径")
+            # SW.reference(self.file_win.currentItem().text(path_clm))
+        elif self.file_win1.currentItem():
+            path_clm = self.file_win1.getHeaderCount(u"路径")
+            # SW.reference(self.file_win1.currentItem().text(path_clm))
+        else:
+            InfoWin(u"请选择文件")
 
 
 class OpenWidget(QtGui.QTabWidget):
@@ -570,9 +662,9 @@ class CreateAssetWin(QtGui.QDialog):
             if os.path.exists(work_path) and os.path.exists(approve_path):
                 tip = InfoWin(u"资产已经存在, 无需创建")
                 tip.show()
-                self.styleComb.clear()
-                self.assetComb.clear()
-                self.stepComb.clear()
+                # self.styleComb.clear()
+                # self.assetComb.clear()
+                # self.stepComb.clear()
 
             else:
                 OS.makeFolder(work_path)
@@ -676,9 +768,25 @@ class AssetDataWin(QtGui.QWidget):
         popwin = CreateAssetWin(**kwarg)
         popwin.exec_()
 
-
     def delAsset(self):
-        print AssetStep
+        '''
+        删除资产
+        '''
+        for i in self.assetTree.selectedItems():
+            # 如果选中的是子节点, sel是父级
+            try:
+                if i.parent():
+                    popwin = WarningWin('Do you want to delete %s--%s ?' % (i.text(0), i.text(1)))
+                    if popwin.reply == QtGui.QMessageBox.Yes:
+                        set = (ProjectPath, "Assets", i.parent().text(0), i.text(0), i.text(1))
+                        # print "/".join(set)
+                        OS.delFolder("/".join(set))
+                        popwin1 = InfoWin("Delete successful")
+                        popwin1.show()
+                    else:
+                        popwin.close()
+            except:
+                pass
 
 
 

@@ -21,10 +21,11 @@ button_style_list = ['MediumGray', 'DarkGray', 'BlueJeans', 'Aqua',
                      'Grapefruit', 'Lavender', 'PinkRose'
                      ]
 
-class Widget(QtGui.QWidget):
-    def __init__(self, parent = None):
-        super(Widget, self).__init__(parent)
 
+class Widget(QtGui.QWidget):
+    def __init__(self, parent=None):
+        super(Widget, self).__init__(parent)
+        pass
 
 
 class TreeWidget(QtGui.QTreeWidget):
@@ -55,6 +56,17 @@ class TreeWidget(QtGui.QTreeWidget):
             self.setHeaderLabels(ls)
         else:
             return ''
+
+    def getSelectItem(self, item, row):
+        # 返回选中的文本
+        return item.text(row)
+
+    def getHeaderCount(self, headername):
+        # 返回headername的列数
+        count = self.columnCount()
+        for i in range(count):
+            if self.headerItem().text(i) == headername:
+                return i
 
     def addChild(self, item, pro_path):
         '''

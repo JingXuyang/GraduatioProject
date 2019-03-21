@@ -140,6 +140,13 @@ class OS(object):
         if not os.path.isdir(folder):
             os.makedirs(folder)
 
+    def delFolder(self, path):
+        '''
+        删除指定的路径
+        :param path:
+        '''
+        shutil.rmtree(path)
+
     def copyFile(self, src, dst):
         '''
 
