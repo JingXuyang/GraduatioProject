@@ -44,6 +44,7 @@ if __name__ == "__main__":
     # main = _ui.AssetDataWin()
     main = _ui.OpenWidget()
     # main = _ui.SaveWidget()
+    # main = _ui.PublishWidget()
     # main = _UI.SubWin("shot", "Animation")
     main.show()
     app.exec_()

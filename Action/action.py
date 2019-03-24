@@ -13,49 +13,208 @@ import datetime
 
 ##################### Global Value #####################
 YamlPath = os.path.join(os.path.dirname(os.path.dirname(__file__)), 'Data/config.yaml').replace("\\", "/")
-FileType = [".mb", ".abc", ".ma"]
-CachePath = "C:/Users/" + os.getenv('username') + "/.jxy"
+MayaPath = os.path.join(os.path.dirname(os.path.dirname(__file__)), "")
+FileType = ['.ma', '.mb', '.abc']
+CachePath = "C:/Users/" + os.getenv('username') + "/.gdpj"
 
 
-def get_variable(str):
+def get_variable(file_name,
+                 sequence='',
+                 asset_name='',
+                 step='',
+                 seq='',
+                 shot='',
+                 describtion='',
+                 describtion_item=''
+                 ):
     '''
-    :param str: yaml文件中带{}的字符串
+
+    当{}中的字符串在"ReadCofig"中有对应的方法名时， 运行对应的函数返回；
+    不存在时返回字符串
+
+    :param file_name: yaml文件中带{}的字符串
     :return: 返回解析后的正确的值
     '''
 
     # print str
-    funct_ls = re.findall(r"{(.*?)}", str)
+    kwarg = {
+        'sequence': sequence,
+        'file_name': file_name,
+        'asset_name': asset_name,
+        'step': step,
+        'seq': seq,
+        'shot': shot,
+        'describtion': describtion,
+        'describtion_item': describtion_item
+    }
+
+    result = []
+
+    funct_ls = re.findall(r"{(.*?)}", file_name)
 
     for i in funct_ls:
+        # 如果class ReadCofig 存在这个变量的action， 则执行相应的action
         if hasattr(ReadCofig, i):
-            # if i == "describtion_item":
             a = ReadCofig()
             # eval() 把字符串改为对应的的变量名，例如：eval("a." + i) <=> ReadCofig.i
             ins = eval("a." + i)
-            # print ins("asset", "Model")
-
-    ref_con = ReadCofig()
-
-    state = {}
-    state["project_path"] = ref_con.get_global()
-    state["type"] = ref_con.allSteps('asset')
-    state["asset_name"] = "char"
-    state["file_name"] = ref_con.get_global()
-    # state["seq"] = ref_con.get_global()
-    # state["shot"] = ref_con.get_global()
-
-    before = str.split("/")
-    after = []
-    for i in before:
-        if "{" in i:
-            var = i[1:-1]
-            if var in state.keys():
-                var = state[var]
-            after.append(var)
+            if sequence == "asset":
+                if i == "describtion_item":
+                    result.append(kwarg[i])
+                else:
+                    result.append(ins("asset", step))
+            else:
+                if i == "describtion_item":
+                    result.append(kwarg[i])
+                else:
+                    result.append(ins("shot", step))
         else:
-            after.append(i)
+            # 如果不存在变量的action, 先看传入进来的kwarg是不是有这个变量，
+            # 如果没有则返回变量本身
+            if kwarg.has_key(i):
+                result.append(kwarg[i])
+            else:
+                result.append(i)
 
-    return "_".join(after)
+    # print "_".join(result)
+    # return  result
+    result[-2] = result[-2]+"."+result[-1]
+    result.pop()
+    return "_".join(result)
+
+
+_vnPattern = re.compile('([a-zA-Z]+)?(#+)')
+def parseVersionPattern(s):
+    result = _vnPattern.findall(s)
+    if result:
+        # s: tst_lgt_v###.ma
+        # result: [('v', '###')]
+        # prefix: v
+        # padPat: ###
+        # vnPat: v###
+        # vnFormat: v%03d
+        # rePat: tst_lgt_v(\d{3}).ma
+        # formatS: tst_lgt_v%03d.ma
+        prefix,padPat = result[-1]
+        vnPat = prefix + padPat
+        count = len(padPat)
+        rePat = s.replace(padPat, '(\d{%s})' % count)
+        rePat = re.compile(rePat)
+        theF = '%0'+str(count)+'d'
+        formatS = s.replace(padPat, theF)
+        vnFormat = prefix + theF
+        return rePat, formatS, vnPat, vnFormat
+    else:
+        return s, s, '', ''
+
+
+_digitsPattern = re.compile('([a-zA-Z]+)?(\d+)')
+def toVersionPattern(string):
+    '''
+    Converts the string to a version pattern.
+
+    Example:
+        string: tst_lgt_v002.ma
+        return: tst_lgt_v###.ma
+    '''
+    result = _digitsPattern.findall(string)
+    if result:
+        # s: tst_lgt_v002.ma
+        # result: [('v', '002')]
+        # prefix: v
+        # digits: 002
+        # digitsPat: v002
+        # vnPat: v###
+        # pattern: tst_lgt_v###.ma
+        prefix, digits = result[-1]
+        digitsPat = prefix + digits
+        vnPat = prefix + len(digits) * '#'
+        pattern = string.replace(digitsPat, vnPat)
+        return pattern
+
+
+def getLatestVersion(files, filenamePattern):
+    '''
+    Gets latest version file of the files.
+    files is a list of string of filenames,
+    filenamePattern is a string for filtering the files.
+
+    Example:
+        files:
+            tst_lgt_v001.ma
+            tst_lgt_v002.ma
+        filenamePattern:
+            tst_lgt_v###.ma or tst_lgt_v001.ma
+        return:
+            {version_pattern: v###
+             version_format: v%03d
+             file_format: tst_lgt_v%03d.ma
+             latest_version: v002
+             latest_version_number: 2
+             latest_file: tst_lgt_v002.ma
+             current_version: v003
+             current_version_number: 3
+             current_file: tst_lgt_v003.ma
+            }
+    '''
+    # Parse patterns
+    # filenamePattern: tst_lgt_v###.ma
+    # filenameRePattern: tst_lgt_v(\d{3}).ma
+    # filenameFormat: tst_lgt_v%03d.ma
+    # versionPattern: v###
+    # versionRePattern: v(\d{3})
+    # versionFormat: v%03d
+    filenameRePattern, filenameFormat, versionPattern, versionFormat = parseVersionPattern(filenamePattern)
+    # print 'filenameRePattern:',filenameRePattern
+    # print 'filenameFormat:', filenameFormat
+    # print 'versionPattern:',versionPattern
+    # print 'versionFormat:', versionFormat
+
+    if filenameRePattern == filenamePattern:
+        # filenameRePattern: tst_lgt_v001.ma
+        # filenameRePattern: tst_lgt_v###.ma
+        filenamePattern = toVersionPattern(filenamePattern)
+        if filenamePattern:
+            filenameRePattern, filenameFormat, versionPattern, versionFormat = parseVersionPattern(filenamePattern)
+        else:
+            return
+
+    # Filter the files
+    okFiles = {}
+    for f in files:
+        r = filenameRePattern.findall(f)
+        # print 'r:',r
+        if r:
+            vn = int(r[0])
+            if not okFiles.has_key(vn):
+                okFiles[vn] = []
+            okFiles[vn].append(f)
+
+    if okFiles:
+        lastVersionNumber = sorted(okFiles.keys())[-1]
+        latestVersion = versionFormat % lastVersionNumber
+        latestFile = okFiles[lastVersionNumber][0]
+    else:
+        lastVersionNumber = 0
+        latestVersion = ''
+        latestFile = ''
+
+    currentVersionNumber = lastVersionNumber + 1
+    currentVersion = versionFormat % currentVersionNumber
+    currentFile = filenameFormat % currentVersionNumber
+
+    result = {
+        'version_pattern': versionPattern,
+        'version_format': versionFormat,
+        'latest_version': latestVersion,
+        'latest_version_number': lastVersionNumber,
+        'latest_file': latestFile,
+        'current_version': currentVersion,
+        'current_version_number': currentVersionNumber,
+        'current_file': currentFile,
+    }
+    return result
+
 
 
 class OS(object):
@@ -250,7 +409,6 @@ class ReadCofig(object):
         :sequence :  shot 或者 asset
         '''
         ls = []
-
         for seq in self.data:
             if seq == sequence:
                 for step in self.data[seq]:
@@ -298,14 +456,27 @@ class ReadCofig(object):
     def short_name(self, sequence='', step=''):
         return self.get_step_message(sequence, step)['short_name']
 
+    def file_name(self, sequence='', step=''):
+        return self.get_step_message(sequence, step)['file_name']
+
     def describtion_item(self, sequence='', step=''):
         return self.get_step_message(sequence, step)['describtion_item']
 
     def work_format(self, sequence='', step=''):
         return self.get_step_message(sequence, step)['work_format']
 
+    # def asset_name(self, name):
+    #     return name
+    #
+    # def describtion_item(self, name):
+    #     return name
 
-    
+
+# dir = {'assetname':'WO', 'step':'Model'}
+#
+# print get_variable('{asset_name}_{short_name}_{describtion_item}_v###.{work_format}',
+#                    **dir
+#                    )
 
 
 

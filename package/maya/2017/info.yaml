@@ -23,19 +23,11 @@ env:
 ############### Commands ###########################
 exe:
     win: 'F:/Maya2017/bin/maya.exe'
-    linux: 
-    mac: 
 
 
 ############### Tools ###########################
 tools:
     - name: mayapy
-      label: Maya Python
-      #icon:
-      exe:
-        win: 'F:/Maya2017/bin/mayapy.exe'
-        linux:
-        mac:
-        
-      #scripts:
+      label: 'F:/Maya2017/bin/mayapy.exe'
+
 

@@ -10,22 +10,24 @@ except:
     from Pyside2 import QtWidgets as QtGui
     from PySide2 import QtCore
 
+from pprint import pprint
+
 from action import action
 from action import maya
 from main import _widgets
 from widget.qss.Utils import *
 
 ##################### Global Value #####################
-SW = maya.Maya()
+# SW = maya.Maya()
 ASSETROOT = ["Character", "Prop", "Set"]
 SEQUENCEROOT = ["Sequences"]
 
 OS = action.OS()
-ConfigData = action.ReadCofig()
+CONFIGDATA = action.ReadCofig()
 file_mes = action.FileMessage()
-ProjectPath = ConfigData.get_global()['project_path']
-AssetStep = ConfigData.allSteps('asset')
-ShotStep = ConfigData.allSteps('shot')
+ProjectPath = CONFIGDATA.get_global()['project_path']
+AssetStep = CONFIGDATA.allSteps('asset')
+ShotStep = CONFIGDATA.allSteps('shot')
 
 
 class InfoWin(QtGui.QDialog):
@@ -156,6 +158,19 @@ class AssetWin(QtGui.QDialog):
         self.folder_win.itemExpanded.connect(self.addChild)
         self.asset_win.openBtn.clicked.connect(self.openFile)
 
+    def getPath(self):
+        '''
+
+        返回选中的item完整路径
+        '''
+        if self.folder_win.currentItem().parent():
+            type_name = self.folder_win.currentItem().parent().text(0)
+            asset_name = self.folder_win.currentItem().text(0)
+            step_name = self.folder_win.currentItem().text(1)
+            set = (ProjectPath, "Assets", type_name, asset_name, step_name)
+            return "/".join(set)
+        else:
+            return ''
 
     def addChild(self, item):
         '''
@@ -181,18 +196,20 @@ class AssetWin(QtGui.QDialog):
         '''
         展开添加文件详细信息
         '''
-        if hasattr(self, 'file_win'):
-            self.file_win.clear()
-            self.file_win1.clear()
+        try:
+            if hasattr(self, 'file_win') or hasattr(self, 'file_win1'):
+                self.file_win.clear()
+                self.file_win1.clear()
+        except:
+            pass
 
         try:
             # 点击子节点
             if not item.childCount():
                 par = self.folder_win.currentItem().parent().text(0)
-
                 # work 下的子节点
-                work_set = (ConfigData.get_global()['project_path'], "Assets", par,
-                            self.folder_win.currentItem().text(0), self.folder_win.currentItem().text(1), "Work")
+                work_set = (CONFIGDATA.get_global()['project_path'], "Assets", par,
+                            self.folder_win.currentItem().text(0), self.folder_win.currentItem().text(1), "work")
                 work_path = "/".join(work_set)
                 file_ls = OS.get_files(work_path)
                 for i in file_ls:
@@ -204,8 +221,8 @@ class AssetWin(QtGui.QDialog):
                     root.setText(5, fl_path)
 
                 # approve 下的子节点
-                approve_set = (ConfigData.get_global()['project_path'], "Assets", par,
-                               self.folder_win.currentItem().text(0), self.folder_win.currentItem().text(1), "Approve")
+                approve_set = (CONFIGDATA.get_global()['project_path'], "Assets", par,
+                               self.folder_win.currentItem().text(0), self.folder_win.currentItem().text(1), "approve")
                 approve_path = "/".join(approve_set)
                 # print approve_path
                 file_ls = OS.get_files(approve_path)
@@ -265,7 +282,6 @@ class AssetWin(QtGui.QDialog):
             InfoWin(u"请选择文件")
 
 
-
 class ShotWin(QtGui.QWidget):
     def __init__(self, parent=None):
         super(ShotWin, self).__init__(parent)
@@ -307,6 +323,18 @@ class ShotWin(QtGui.QWidget):
         else:
             self.root_ls.insert(1, item.text(0))
 
+    def getPath(self):
+        '''
+
+        返回选中的item完整路径
+        '''
+        if self.folder_win.currentItem().parent():
+            root_ls = [ProjectPath]
+            self.get_root(self.folder_win.currentItem())
+            return "/".join(self.root_ls)
+        else:
+            return ''
+
     def addChild(self, item):
         '''
         搜索文件夹添加到资产的item
@@ -332,36 +360,39 @@ class ShotWin(QtGui.QWidget):
         '''
         添加文件详细信息
         '''
-        if hasattr(self, 'file_win'):
-            self.file_win.clear()
-        if hasattr(self, 'file_win1'):
-            self.file_win1.clear()
+        try:
+            if hasattr(self, 'file_win'):
+                self.file_win.clear()
+            if hasattr(self, 'file_win1'):
+                self.file_win1.clear()
+            # 点击子节点
+            if not item.childCount():
+                # work 下的子节点
+                work_set = ("/".join(self.root_ls), self.folder_win.currentItem().text(0), "Work")
+                work_path = "/".join(work_set)
+                file_ls = OS.get_files(work_path)
+                root = QtGui.QTreeWidgetItem(self.file_win)
+                for i in file_ls:
+                    fl_path = work_path + "/" + i
+                    root.setText(0, OS.get_basename(fl_path))
+                    root.setText(3, file_mes.get_FileModifyTime(fl_path))
+                    root.setText(4, file_mes.get_FileSize(fl_path))
+                    root.setText(5, fl_path)
 
-        # 点击子节点
-        if not item.childCount():
-            # work 下的子节点
-            work_set = ("/".join(self.root_ls), self.folder_win.currentItem().text(0), "Work")
-            work_path = "/".join(work_set)
-            file_ls = OS.get_files(work_path)
-            root = QtGui.QTreeWidgetItem(self.file_win)
-            for i in file_ls:
-                fl_path = work_path + "/" + i
-                root.setText(0, OS.get_basename(fl_path))
-                root.setText(3, file_mes.get_FileModifyTime(fl_path))
-                root.setText(4, file_mes.get_FileSize(fl_path))
-                root.setText(5, fl_path)
+                # approve 下的子节点
+                approve_set = ("/".join(self.root_ls), self.folder_win.currentItem().text(0), "Approve")
+                approve_path = "/".join(approve_set)
+                file_ls = OS.get_files(approve_path)
+                for i in file_ls:
+                    root = QtGui.QTreeWidgetItem(self.file_win1)
+                    fl_path = approve_path+"/"+i
+                    root.setText(0, OS.get_basename(fl_path))
+                    root.setText(3, file_mes.get_FileModifyTime(fl_path))
+                    root.setText(4, file_mes.get_FileSize(fl_path))
+                    root.setText(5, fl_path)
+        except:
+            pass
 
-            # approve 下的子节点
-            approve_set = ("/".join(self.root_ls), self.folder_win.currentItem().text(0), "Approve")
-            approve_path = "/".join(approve_set)
-            file_ls = OS.get_files(approve_path)
-            for i in file_ls:
-                root = QtGui.QTreeWidgetItem(self.file_win1)
-                fl_path = approve_path+"/"+i
-                root.setText(0, OS.get_basename(fl_path))
-                root.setText(3, file_mes.get_FileModifyTime(fl_path))
-                root.setText(4, file_mes.get_FileSize(fl_path))
-                root.setText(5, fl_path)
 
     def openFile(self):
         '''
@@ -485,8 +516,63 @@ class SaveWidget(QtGui.QTabWidget):
                     self.clearLayout(item.layout())
 
     def next(self):
+        # kwarg = {
+        #     'file_path': '',
+        #     'file_des': '',
+        #     'des': ''
+        # }
+        # print self.tab1.getPath()
+        # try:
+        #     subwin = SubWin("asset", self.tab1.asset_win.folder_win.currentItem().text(1), "Submite")
+        #     # 子窗口不关闭无法操作父窗口
+        #     subwin.setWindowModality(QtCore.Qt.ApplicationModal)
+        #     subwin.exec_()
+        # except:
+        #     InfoWin(u"请选择相应的环节保存")
         try:
-            subwin = SubWin("asset", self.tab1.asset_win.folder_win.currentItem().text(1))
+            kwagrs = {
+                'sequence': 'asset',
+                'assetname': self.tab1.asset_win.folder_win.currentItem().text(0),
+                'step': self.tab1.asset_win.folder_win.currentItem().text(1),
+                'filepath': self.tab1.getPath()
+            }
+            # pprint(kwagrs)
+            subwin = SubWin("asset", "Submite", **kwagrs)
+            # 子窗口不关闭无法操作父窗口
+            subwin.setWindowModality(QtCore.Qt.ApplicationModal)
+            subwin.exec_()
+        except:
+            InfoWin(u"请选择相应的环节保存")
+
+    def next1(self):
+        print self.tab2.getPath()
+        try:
+            subwin = SubWin("shot", self.tab2.shot_win.folder_win.currentItem().text(0), "Submite")
+            # 子窗口不关闭无法操作父窗口
+            subwin.setWindowModality(QtCore.Qt.ApplicationModal)
+            subwin.exec_()
+        except:
+            InfoWin(u"请选择相应的环节保存")
+
+
+class PublishWidget(SaveWidget):
+    def __init__(self, parent=None):
+        super(PublishWidget, self).__init__(parent)
+
+        self.setWindowTitle("Publish scene")
+
+    def next(self):
+        try:
+            kwagrs = {
+                'sequence': 'asset',
+                'assetname': self.tab1.asset_win.folder_win.currentItem().text(0),
+                'step': self.tab1.asset_win.folder_win.currentItem().text(1),
+                'filepath': self.tab1.getPath()
+            }
+            # pprint(kwagrs)
+            subwin = SubWin("asset", "Publish", **kwagrs)
+            subwin.extend_des_lab.setVisible(False)
+            subwin.des_com.setVisible(False)
             # 子窗口不关闭无法操作父窗口
             subwin.setWindowModality(QtCore.Qt.ApplicationModal)
             subwin.exec_()
@@ -495,7 +581,16 @@ class SaveWidget(QtGui.QTabWidget):
 
     def next1(self):
         try:
-            subwin = SubWin("shot", self.tab2.shot_win.folder_win.currentItem().text(0))
+            kwagrs = {
+                'sequence': self.tab2.shot_win.folder_win.topLevelItem(0).child(0).text(0),
+                'shot': self.tab2.shot_win.folder_win.currentItem().parent().text(0),
+                'step': self.tab2.shot_win.folder_win.currentItem().text(0),
+                'filepath': self.tab2.getPath()
+            }
+            # print kwagrs
+            subwin = SubWin("shot", "Publish", **kwagrs)
+            subwin.extend_des_lab.setVisible(False)
+            subwin.des_com.setVisible(False)
             # 子窗口不关闭无法操作父窗口
             subwin.setWindowModality(QtCore.Qt.ApplicationModal)
             subwin.exec_()
@@ -504,32 +599,46 @@ class SaveWidget(QtGui.QTabWidget):
 
 
 class SubWin(QtGui.QDialog):
-    def __init__(self, AorS, step, parent=None):
+    def __init__(self, AorS, state='',
+                 filepath='',
+                 sequence='',
+                 assetname='',
+                 shot='',
+                 step='',
+                 parent=None
+                 ):
         '''
         
         :param AorS: 'asset' or 'shot'
-        :param step: 各个流程环节
+        :param assetname: 资产或镜头名
+        :param step: 流程环节
+        :param state: 窗口名称
         '''
         super(SubWin, self).__init__(parent)
         self.resize(300, 250)
         self.setWindowTitle(u"提交")
         self.a_or_s = AorS
+        self.filepath = filepath
+        self.sequence = sequence
+        self.shot = shot
+        self.assetname = assetname
         self.step = step
+        self.state = state
 
         self._ui()
 
     def _ui(self):
 
         # ------------------ 界面 -------------------
-        self.setWindowTitle(self.step.capitalize() + " Submit")
+        self.setWindowTitle(self.step.capitalize() + " " + self.state)
 
         des_lab = QtGui.QLabel(u"描述：")
         self.des_win = QtGui.QTextEdit()
 
-        extend_des_lab = QtGui.QLabel(u"文件描述:")
+        self.extend_des_lab = QtGui.QLabel(u"文件描述:")
         self.des_com = QtGui.QComboBox()
         self.des_com.setMinimumWidth(100)
-        items = ConfigData.get_step_message(self.a_or_s, self.step)["describtion_item"]
+        items = CONFIGDATA.get_step_message(self.a_or_s, self.step)["describtion_item"]
         self.des_com.addItems(items)
 
         sum_butt = _widgets.PushButton(u"提交")
@@ -537,10 +646,10 @@ class SubWin(QtGui.QDialog):
 
         # ------------------ 布局 -------------------
 
-        lay1 = QtGui.QHBoxLayout()
-        lay1.addWidget(extend_des_lab)
-        lay1.addWidget(self.des_com)
-        lay1.addStretch()
+        self.lay1 = QtGui.QHBoxLayout()
+        self.lay1.addWidget(self.extend_des_lab)
+        self.lay1.addWidget(self.des_com)
+        self.lay1.addStretch()
 
         lay2 = QtGui.QHBoxLayout()
         lay2.addStretch()
@@ -549,7 +658,7 @@ class SubWin(QtGui.QDialog):
         lay = QtGui.QVBoxLayout()
         lay.addWidget(des_lab)
         lay.addWidget(self.des_win)
-        lay.addLayout(lay1)
+        lay.addLayout(self.lay1)
         lay.addLayout(lay2)
 
         self.setLayout(lay)
@@ -559,9 +668,31 @@ class SubWin(QtGui.QDialog):
 
 
     def submite(self):
-        print self.des_win.toPlainText()
-        print self.des_com.currentText()
+        # print self.des_win.toPlainText()
+        # print self.des_com.currentText()
 
+        kwarg = {
+            'file_path': self.filepath,
+            'file_name': CONFIGDATA.file_name(self.a_or_s, self.step),
+            'sequence': self.sequence,
+            'asset_name': self.assetname,
+            'step': self.step,
+            'describtion': self.des_win.toPlainText()
+        }
+        # print kwarg
+        var_key = {
+            'sequence': self.sequence,
+            'file_name': CONFIGDATA.file_name(self.a_or_s, self.step),
+            'asset_name': self.assetname,
+            'shot': self.shot,
+            'step': self.step,
+            'describtion': self.des_win.toPlainText(),
+            'describtion_item': self.des_com.currentText()
+        }
+        # pprint(var_key)
+        file_name = action.get_variable(**var_key)
+        # print file_name
+        print action.getLatestVersion(self.filepath, file_name)['current_file']
         cache = {}
         cache["description"] = self.des_win.toPlainText()
 
