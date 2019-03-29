@@ -2,8 +2,8 @@
 
 import os
 
-from PySide import QtGui
-from PySide import QtCore
+from qtlb.Qt import QtCore
+from qtlb.Qt import QtGui
 
 from MessageWidget import MessageAsk, Message
 

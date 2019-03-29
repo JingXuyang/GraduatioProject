@@ -2,7 +2,8 @@
 __author__ = "liaokong"
 __time__ = "2018/11/16 10:02"
 
-from PySide import QtGui
+from qtlb.Qt import QtCore
+from qtlb.Qt import QtGui
 
 from Utils import load_style, button_style
 

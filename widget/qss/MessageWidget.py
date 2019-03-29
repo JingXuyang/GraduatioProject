@@ -2,11 +2,12 @@
 __author__ = "liaokong"
 __time__ = "2018/10/16 14:16"
 
-from PySide import QtGui
-from PySide import QtCore
+from qtlb.Qt import QtCore
+from qtlb.Qt import QtGui
+from qtlb.Qt import QtWidgets
 
 
-class Message(QtGui.QDialog):
+class Message(QtWidgets.QWidget):
     def __init__(self, parent=None):
         super(Message, self).__init__(parent)
 
@@ -171,7 +172,7 @@ class Message(QtGui.QDialog):
         self.setCursor(QtGui.QCursor(QtCore.Qt.ArrowCursor))
 
 
-class MessageAsk(QtGui.QDialog):
+class MessageAsk(QtWidgets.QDialog):
     status = False
 
     def __init__(self, parent=None):

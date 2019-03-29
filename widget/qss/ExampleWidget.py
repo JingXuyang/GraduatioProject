@@ -2,8 +2,13 @@
 __author__ = "liaokong"
 __time__ = "2018/10/17 15:08"
 
-from PySide import QtGui
-from PySide import QtCore
+try:
+    from PySide import QtGui
+    from PySide import QtCore
+except:
+    from PySide2 import QtGui
+    from PySide2 import QtWidgets as QtGui
+    from PySide2 import QtCore
 
 from Utils import *
 

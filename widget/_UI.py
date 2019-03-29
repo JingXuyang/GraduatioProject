@@ -2,13 +2,15 @@
 # -*- coding: utf-8 -*-
 #
 
-try:
-    from PySide import QtGui
-    from PySide import QtCore
-except:
-    from PySide2 import QtGui
-    from Pyside2 import QtWidgets as QtGui
-    from PySide2 import QtCore
+
+from qtlb.Qt import QtCore
+from qtlb.Qt import QtGui
+from qtlb.Qt import QtWidgets
+
+import os
+import sys
+sys.path.append(os.path.dirname(os.path.realpath('__file__'))+"\\widget")
+
 
 from pprint import pprint
 
@@ -30,7 +32,7 @@ AssetStep = CONFIGDATA.allSteps('asset')
 ShotStep = CONFIGDATA.allSteps('shot')
 
 
-class InfoWin(QtGui.QDialog):
+class InfoWin(QtWidgets.QDialog):
     def __init__(self, message, parent=None):
         '''
 
@@ -44,7 +46,7 @@ class InfoWin(QtGui.QDialog):
         QtGui.QMessageBox.information(self, "Tip", self.mes, QtGui.QMessageBox.Yes)
 
 
-class WarningWin(QtGui.QDialog):
+class WarningWin(QtWidgets.QDialog):
     def __init__(self, message, parent=None):
         '''
 
@@ -59,7 +61,7 @@ class WarningWin(QtGui.QDialog):
                                                 QtGui.QMessageBox.Yes|QtGui.QMessageBox.No)
 
 
-class BasicWin(QtGui.QDialog):
+class BasicWin(QtWidgets.QDialog):
     def __init__(self, parent=None):
         super(BasicWin, self).__init__(parent)
 
@@ -77,8 +79,8 @@ class BasicWin(QtGui.QDialog):
         self.folder_win.set_header_labels(head_list)
 
         # ------------------ 中间部分 -------------------
-        self.lab = QtGui.QLabel(u"工作文件")
-        self.asset_search = QtGui.QLineEdit()
+        self.lab = QtWidgets.QLabel(u"工作文件")
+        self.asset_search = QtWidgets.QLineEdit()
         self.asset_search.setMaximumWidth(100)
         # 设置提示输入文本
         self.asset_search.setPlaceholderText(u"搜索...")
@@ -94,7 +96,7 @@ class BasicWin(QtGui.QDialog):
         self.file_win.setHeaderLabels(head_list)
         self.file_win1.setHeaderLabels(head_list)
 
-        tabwin = QtGui.QTabWidget()
+        tabwin = QtWidgets.QTabWidget()
         tabwin.addTab(self.file_win, 'Work')
         tabwin.addTab(self.file_win1, 'Approved')
 
@@ -104,21 +106,21 @@ class BasicWin(QtGui.QDialog):
         self.openBtn = _widgets.PushButton(u"打开")
 
         # ------------------ 布局 -------------------
-        self.mid = QtGui.QHBoxLayout()
+        self.mid = QtWidgets.QHBoxLayout()
         self.mid.addWidget(self.lab)
         self.mid.addStretch()
         self.mid.addWidget(self.asset_search)
 
-        self.mid1 = QtGui.QVBoxLayout()
+        self.mid1 = QtWidgets.QVBoxLayout()
         self.mid1.addWidget(tabwin)
 
-        self.bottom = QtGui.QHBoxLayout()
+        self.bottom = QtWidgets.QHBoxLayout()
         self.bottom.addStretch()
         self.bottom.addWidget(self.inputBtn)
         self.bottom.addWidget(self.referBtn)
         self.bottom.addWidget(self.openBtn)
 
-        lay = QtGui.QVBoxLayout()
+        lay = QtWidgets.QVBoxLayout()
         lay.setSpacing(3)
         lay.addWidget(self.folder_win)
         lay.addLayout(self.mid)
@@ -128,7 +130,7 @@ class BasicWin(QtGui.QDialog):
         self.setLayout(lay)
 
 
-class AssetWin(QtGui.QDialog):
+class AssetWin(QtWidgets.QDialog):
     def __init__(self, parent=None):
         super(AssetWin, self).__init__(parent)
 
@@ -142,12 +144,12 @@ class AssetWin(QtGui.QDialog):
         self.file_win1 = self.asset_win.file_win1
 
         for i in ASSETROOT:
-            root = QtGui.QTreeWidgetItem(self.folder_win)
+            root = QtWidgets.QTreeWidgetItem(self.folder_win)
             root.setText(0, i)
-            child = QtGui.QTreeWidgetItem(root)
+            child = QtWidgets.QTreeWidgetItem(root)
             child.setText(0, "")
 
-        lay = QtGui.QVBoxLayout()
+        lay = QtWidgets.QVBoxLayout()
         lay.setSpacing(0)
         lay.addWidget(self.asset_win)
 
@@ -185,11 +187,11 @@ class AssetWin(QtGui.QDialog):
                 AssetStep = OS.get_folders("/".join(set)+"/"+name)
                 AssetStep.sort()
                 for chi in AssetStep:
-                    root = QtGui.QTreeWidgetItem(item)
+                    root = QtWidgets.QTreeWidgetItem(item)
                     root.setText(0, name)
                     root.setText(1, chi)
         else:
-            root = QtGui.QTreeWidgetItem(item)
+            root = QtWidgets.QTreeWidgetItem(item)
             root.setText(1, "")
 
     def click(self, item):
@@ -213,7 +215,7 @@ class AssetWin(QtGui.QDialog):
                 work_path = "/".join(work_set)
                 file_ls = OS.get_files(work_path)
                 for i in file_ls:
-                    root = QtGui.QTreeWidgetItem(self.file_win)
+                    root = QtWidgets.QTreeWidgetItem(self.file_win)
                     fl_path = work_path + "/" + i
                     root.setText(0, OS.get_basename(fl_path))
                     root.setText(3, file_mes.get_FileModifyTime(fl_path))
@@ -227,7 +229,7 @@ class AssetWin(QtGui.QDialog):
                 # print approve_path
                 file_ls = OS.get_files(approve_path)
                 for i in file_ls:
-                    root = QtGui.QTreeWidgetItem(self.file_win1)
+                    root = QtWidgets.QTreeWidgetItem(self.file_win1)
                     fl_path = approve_path + "/" + i
                     # print "jxy", fl_path
                     root.setText(0, OS.get_basename(fl_path))
@@ -282,7 +284,7 @@ class AssetWin(QtGui.QDialog):
             InfoWin(u"请选择文件")
 
 
-class ShotWin(QtGui.QWidget):
+class ShotWin(QtWidgets.QDialog):
     def __init__(self, parent=None):
         super(ShotWin, self).__init__(parent)
 
@@ -296,12 +298,12 @@ class ShotWin(QtGui.QWidget):
         self.file_win1 = self.shot_win.file_win1
 
         for i in SEQUENCEROOT:
-            root = QtGui.QTreeWidgetItem(self.folder_win)
+            root = QtWidgets.QTreeWidgetItem(self.folder_win)
             root.setText(0, i)
-            child = QtGui.QTreeWidgetItem(root)
+            child = QtWidgets.QTreeWidgetItem(root)
             child.setText(1, "")
 
-        lay = QtGui.QVBoxLayout()
+        lay = QtWidgets.QVBoxLayout()
         lay.addWidget(self.shot_win)
 
         self.setLayout(lay)
@@ -349,11 +351,11 @@ class ShotWin(QtGui.QWidget):
 
         if len(child) > 0:
             for name in child:
-                root = QtGui.QTreeWidgetItem(item)
+                root = QtWidgets.QTreeWidgetItem(item)
                 root.setText(0, name)
                 # 环节文件夹时不再添加子节点
                 if name not in ShotStep:
-                    root1 = QtGui.QTreeWidgetItem(root)
+                    root1 = QtWidgets.QTreeWidgetItem(root)
                     root1.setText(0, "")
 
     def click(self, item):
@@ -371,7 +373,7 @@ class ShotWin(QtGui.QWidget):
                 work_set = ("/".join(self.root_ls), self.folder_win.currentItem().text(0), "Work")
                 work_path = "/".join(work_set)
                 file_ls = OS.get_files(work_path)
-                root = QtGui.QTreeWidgetItem(self.file_win)
+                root = QtWidgets.QTreeWidgetItem(self.file_win)
                 for i in file_ls:
                     fl_path = work_path + "/" + i
                     root.setText(0, OS.get_basename(fl_path))
@@ -384,7 +386,7 @@ class ShotWin(QtGui.QWidget):
                 approve_path = "/".join(approve_set)
                 file_ls = OS.get_files(approve_path)
                 for i in file_ls:
-                    root = QtGui.QTreeWidgetItem(self.file_win1)
+                    root = QtWidgets.QTreeWidgetItem(self.file_win1)
                     fl_path = approve_path+"/"+i
                     root.setText(0, OS.get_basename(fl_path))
                     root.setText(3, file_mes.get_FileModifyTime(fl_path))
@@ -438,7 +440,7 @@ class ShotWin(QtGui.QWidget):
             InfoWin(u"请选择文件")
 
 
-class OpenWidget(QtGui.QTabWidget):
+class OpenWidget(QtWidgets.QTabWidget):
 
     def __init__(self, parent=None):
         super(OpenWidget, self).__init__(parent)
@@ -459,7 +461,7 @@ class OpenWidget(QtGui.QTabWidget):
         self.addTab(self.tab2, u"镜头")
 
 
-class SaveWidget(QtGui.QTabWidget):
+class SaveWidget(QtWidgets.QTabWidget):
 
     def __init__(self, parent=None):
         super(SaveWidget, self).__init__(parent)
@@ -476,7 +478,7 @@ class SaveWidget(QtGui.QTabWidget):
         self.clearLayout(self.tab1.asset_win.bottom)
 
         saveBtn = _widgets.PushButton(u"下一步")
-        lay = QtGui.QHBoxLayout()
+        lay = QtWidgets.QHBoxLayout()
         lay.addStretch()
         lay.addWidget(saveBtn)
         self.tab1.layout().insertLayout(4, lay)
@@ -488,7 +490,7 @@ class SaveWidget(QtGui.QTabWidget):
         self.clearLayout(self.tab2.shot_win.bottom)
 
         saveBtn1 = _widgets.PushButton(u"下一步")
-        lay1 = QtGui.QHBoxLayout()
+        lay1 = QtWidgets.QHBoxLayout()
         lay1.addStretch()
         lay1.addWidget(saveBtn1)
         self.tab2.layout().insertLayout(4, lay1)
@@ -598,7 +600,7 @@ class PublishWidget(SaveWidget):
             InfoWin(u"请选择相应的环节保存")
 
 
-class SubWin(QtGui.QDialog):
+class SubWin(QtWidgets.QDialog):
     def __init__(self, AorS, state='',
                  filepath='',
                  sequence='',
@@ -632,11 +634,11 @@ class SubWin(QtGui.QDialog):
         # ------------------ 界面 -------------------
         self.setWindowTitle(self.step.capitalize() + " " + self.state)
 
-        des_lab = QtGui.QLabel(u"描述：")
-        self.des_win = QtGui.QTextEdit()
+        des_lab = QtWidgets.QLabel(u"描述：")
+        self.des_win = QtWidgets.QTextEdit()
 
-        self.extend_des_lab = QtGui.QLabel(u"文件描述:")
-        self.des_com = QtGui.QComboBox()
+        self.extend_des_lab = QtWidgets.QLabel(u"文件描述:")
+        self.des_com = QtWidgets.QComboBox()
         self.des_com.setMinimumWidth(100)
         items = CONFIGDATA.get_step_message(self.a_or_s, self.step)["describtion_item"]
         self.des_com.addItems(items)
@@ -646,16 +648,16 @@ class SubWin(QtGui.QDialog):
 
         # ------------------ 布局 -------------------
 
-        self.lay1 = QtGui.QHBoxLayout()
+        self.lay1 = QtWidgets.QHBoxLayout()
         self.lay1.addWidget(self.extend_des_lab)
         self.lay1.addWidget(self.des_com)
         self.lay1.addStretch()
 
-        lay2 = QtGui.QHBoxLayout()
+        lay2 = QtWidgets.QHBoxLayout()
         lay2.addStretch()
         lay2.addWidget(sum_butt)
 
-        lay = QtGui.QVBoxLayout()
+        lay = QtWidgets.QVBoxLayout()
         lay.addWidget(des_lab)
         lay.addWidget(self.des_win)
         lay.addLayout(self.lay1)
@@ -700,7 +702,7 @@ class SubWin(QtGui.QDialog):
         self.close()
 
 
-class CreateAssetWin(QtGui.QDialog):
+class CreateAssetWin(QtWidgets.QDialog):
 
     def __init__(self, style_ls=[], asset_ls=[], step_ls=[], parent=None):
         '''
@@ -719,9 +721,9 @@ class CreateAssetWin(QtGui.QDialog):
     def _UI(self):
         self.setWindowTitle(u"Create Asset")
         self.resize(250, 200)
-        lab1 = QtGui.QLabel(u"Asset Style:")
-        lab2 = QtGui.QLabel(u"Asset Name:")
-        lab3 = QtGui.QLabel(u"Step:")
+        lab1 = QtWidgets.QLabel(u"Asset Style:")
+        lab2 = QtWidgets.QLabel(u"Asset Name:")
+        lab3 = QtWidgets.QLabel(u"Step:")
 
         self.styleComb = _widgets.ComboBox()
         self.assetComb = _widgets.ComboBox()
@@ -733,11 +735,11 @@ class CreateAssetWin(QtGui.QDialog):
         self.assetComb.setEditable(True)
 
         # 布局
-        lay1 = QtGui.QHBoxLayout()
+        lay1 = QtWidgets.QHBoxLayout()
         lay1.addStretch()
         lay1.addWidget(self.save)
         lay1.addWidget(self.cancel)
-        lay = QtGui.QGridLayout()
+        lay = QtWidgets.QGridLayout()
         lay.addWidget(lab1, 0, 0)
         lay.addWidget(self.styleComb, 0, 1)
         lay.addWidget(lab2, 1, 0)
@@ -767,7 +769,7 @@ class CreateAssetWin(QtGui.QDialog):
         self.stepComb.setCurrentIndex(-1)
 
         # 增加自动补全
-        self.completer = QtGui.QCompleter(self.asset_ls)
+        self.completer = QtWidgets.QCompleter(self.asset_ls)
         self.assetComb.setCompleter(self.completer)
 
     def saveCon(self):
@@ -811,7 +813,7 @@ class CreateAssetWin(QtGui.QDialog):
             tip.show()
 
 
-class AssetDataWin(QtGui.QWidget):
+class AssetDataWin(QtWidgets.QDialog):
     def __init__(self, parent=None):
         super(AssetDataWin, self).__init__(parent)
 
@@ -826,20 +828,20 @@ class AssetDataWin(QtGui.QWidget):
         self.assetTree = asset_win.folder_win
 
         for i in ASSETROOT:
-            root = QtGui.QTreeWidgetItem(self.assetTree)
+            root = QtWidgets.QTreeWidgetItem(self.assetTree)
             root.setText(0, i)
-            child = QtGui.QTreeWidgetItem(root)
+            child = QtWidgets.QTreeWidgetItem(root)
             child.setText(0, "")
 
         # --------------------- Menu ---------------------
         '''
-        将ContextMenuPolicy设置为QtGui.CustomContextMenu.
+        将ContextMenuPolicy设置为QtWidgets.CustomContextMenu.
         否则无法使用customContextMenuRequested信号
         '''
         self.setContextMenuPolicy(QtCore.Qt.CustomContextMenu)
         # 创建QMenu信号事件
         self.customContextMenuRequested.connect(self.showMenu)
-        self.contextMenu = QtGui.QMenu(self)
+        self.contextMenu = QtWidgets.QMenu(self)
         self.add = self.contextMenu.addAction('Create asset')
         self.delete = self.contextMenu.addAction('Delete asset')
         # 二级菜单
@@ -847,7 +849,7 @@ class AssetDataWin(QtGui.QWidget):
         # self.ZJ = self.GN.addAction('增加')
 
         # --------------------- Layout ---------------------
-        lay = QtGui.QVBoxLayout()
+        lay = QtWidgets.QVBoxLayout()
         lay.addWidget(self.assetTree)
 
         self.setLayout(lay)
@@ -868,7 +870,7 @@ class AssetDataWin(QtGui.QWidget):
         '''
         if self.assetTree.selectedItems():
             # print self.assetTree.selectedItems()[0].text(0)
-            self.contextMenu.exec_(QtGui.QCursor.pos())  # 在鼠标位置显示
+            self.contextMenu.exec_(QtWidgets.QCursor.pos())  # 在鼠标位置显示
 
 
     def addAsset(self):
@@ -908,7 +910,7 @@ class AssetDataWin(QtGui.QWidget):
             try:
                 if i.parent():
                     popwin = WarningWin('Do you want to delete %s--%s ?' % (i.text(0), i.text(1)))
-                    if popwin.reply == QtGui.QMessageBox.Yes:
+                    if popwin.reply == QtWidgets.QMessageBox.Yes:
                         set = (ProjectPath, "Assets", i.parent().text(0), i.text(0), i.text(1))
                         # print "/".join(set)
                         OS.delFolder("/".join(set))
