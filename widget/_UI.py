@@ -15,12 +15,12 @@ sys.path.append(os.path.dirname(os.path.realpath('__file__'))+"\\widget")
 from pprint import pprint
 
 from action import action
-from action import maya
+from action import mayaApi
 from main import _widgets
 from widget.qss.Utils import *
 
 ##################### Global Value #####################
-# SW = maya.Maya()
+SW = mayaApi.Maya()
 ASSETROOT = ["Character", "Prop", "Set"]
 SEQUENCEROOT = ["Sequences"]
 
@@ -43,7 +43,7 @@ class InfoWin(QtWidgets.QDialog):
         self._ui()
 
     def _ui(self):
-        QtGui.QMessageBox.information(self, "Tip", self.mes, QtGui.QMessageBox.Yes)
+        QtWidgets.QMessageBox.information(self, "Tip", self.mes, QtWidgets.QMessageBox.Yes)
 
 
 class WarningWin(QtWidgets.QDialog):
@@ -57,8 +57,8 @@ class WarningWin(QtWidgets.QDialog):
         self._ui()
 
     def _ui(self):
-        self.reply = QtGui.QMessageBox.question(self, 'Warning', self.mes,
-                                                QtGui.QMessageBox.Yes|QtGui.QMessageBox.No)
+        self.reply = QtWidgets.QMessageBox.question(self, 'Warning', self.mes,
+                                                    QtWidgets.QMessageBox.Yes|QtWidgets.QMessageBox.No)
 
 
 class BasicWin(QtWidgets.QDialog):
@@ -159,6 +159,8 @@ class AssetWin(QtWidgets.QDialog):
         self.folder_win.itemClicked.connect(self.click)
         self.folder_win.itemExpanded.connect(self.addChild)
         self.asset_win.openBtn.clicked.connect(self.openFile)
+        self.asset_win.referBtn.clicked.connect(self.referenceFile)
+        self.asset_win.inputBtn.clicked.connect(self.importFile)
 
     def getPath(self):
         '''
@@ -248,10 +250,10 @@ class AssetWin(QtWidgets.QDialog):
 
         if self.file_win.currentItem():
             path_clm = self.file_win.getHeaderCount(u"路径")
-            # SW.open(self.file_win.currentItem().text(path_clm))
+            SW.open(self.file_win.currentItem().text(path_clm), True)
         elif self.file_win1.currentItem():
             path_clm = self.file_win1.getHeaderCount(u"路径")
-            # SW.open(self.file_win1.currentItem().text(path_clm))
+            SW.open(self.file_win1.currentItem().text(path_clm), True)
         else:
             InfoWin(u"请选择文件")
 
@@ -262,10 +264,10 @@ class AssetWin(QtWidgets.QDialog):
         '''
         if self.file_win.currentItem():
             path_clm = self.file_win.getHeaderCount(u"路径")
-            # SW.open(self.file_win.currentItem().text(path_clm))
+            SW.import_(self.file_win.currentItem().text(path_clm))
         elif self.file_win1.currentItem():
             path_clm = self.file_win1.getHeaderCount(u"路径")
-            # SW.open(self.file_win1.currentItem().text(path_clm))
+            SW.import_(self.file_win1.currentItem().text(path_clm))
         else:
             InfoWin(u"请选择文件")
 
@@ -276,10 +278,10 @@ class AssetWin(QtWidgets.QDialog):
         '''
         if self.file_win.currentItem():
             path_clm = self.file_win.getHeaderCount(u"路径")
-            # SW.reference(self.file_win.currentItem().text(path_clm))
+            SW.reference(self.file_win.currentItem().text(path_clm), removeNamespace=False)
         elif self.file_win1.currentItem():
             path_clm = self.file_win1.getHeaderCount(u"路径")
-            # SW.reference(self.file_win1.currentItem().text(path_clm))
+            SW.reference(self.file_win1.currentItem().text(path_clm), removeNamespace=False)
         else:
             InfoWin(u"请选择文件")
 
@@ -312,6 +314,8 @@ class ShotWin(QtWidgets.QDialog):
         self.folder_win.itemClicked.connect(self.click)
         self.folder_win.itemExpanded.connect(self.addChild)
         self.shot_win.openBtn.clicked.connect(self.openFile)
+        self.shot_win.inputBtn.clicked.connect(self.importFile)
+        self.shot_win.referBtn.clicked.connect(self.referenceFile)
 
     def get_root(self, item):
         '''
@@ -325,15 +329,27 @@ class ShotWin(QtWidgets.QDialog):
         else:
             self.root_ls.insert(1, item.text(0))
 
+    def get_root1(self, item):
+        '''
+        返回item的根节点列表
+        '''
+
+        if item.parent():
+            self.get_root_path.insert(1, item.text(0))
+            self.get_root1(item.parent())
+
+        else:
+            self.get_root_path.insert(1, item.text(0))
+
     def getPath(self):
         '''
 
         返回选中的item完整路径
         '''
-        if self.folder_win.currentItem().parent():
-            root_ls = [ProjectPath]
-            self.get_root(self.folder_win.currentItem())
-            return "/".join(self.root_ls)
+        if not self.folder_win.currentItem().childCount():
+            self.get_root_path = [ProjectPath]
+            self.get_root1(self.folder_win.currentItem())
+            return "/".join(self.get_root_path)
         else:
             return ''
 
@@ -370,7 +386,7 @@ class ShotWin(QtWidgets.QDialog):
             # 点击子节点
             if not item.childCount():
                 # work 下的子节点
-                work_set = ("/".join(self.root_ls), self.folder_win.currentItem().text(0), "Work")
+                work_set = ("/".join(self.root_ls), self.folder_win.currentItem().text(0), "work")
                 work_path = "/".join(work_set)
                 file_ls = OS.get_files(work_path)
                 root = QtWidgets.QTreeWidgetItem(self.file_win)
@@ -382,7 +398,7 @@ class ShotWin(QtWidgets.QDialog):
                     root.setText(5, fl_path)
 
                 # approve 下的子节点
-                approve_set = ("/".join(self.root_ls), self.folder_win.currentItem().text(0), "Approve")
+                approve_set = ("/".join(self.root_ls), self.folder_win.currentItem().text(0), "approve")
                 approve_path = "/".join(approve_set)
                 file_ls = OS.get_files(approve_path)
                 for i in file_ls:
@@ -401,13 +417,15 @@ class ShotWin(QtWidgets.QDialog):
         打开选中的文件
         :return:
         '''
-
+        print self.getPath()
         if self.file_win.currentItem():
             path_clm = self.file_win.getHeaderCount(u"路径")
-            # SW.open(self.file_win.currentItem().text(path_clm))
+            # print self.file_win.currentItem().text(path_clm)
+            SW.open(self.file_win.currentItem().text(path_clm), True)
         elif self.file_win1.currentItem():
+
             path_clm = self.file_win1.getHeaderCount(u"路径")
-            # SW.open(self.file_win1.currentItem().text(path_clm))
+            SW.open(self.file_win1.currentItem().text(path_clm), True)
         else:
             InfoWin(u"请选择文件")
 
@@ -418,10 +436,10 @@ class ShotWin(QtWidgets.QDialog):
         '''
         if self.file_win.currentItem():
             path_clm = self.file_win.getHeaderCount(u"路径")
-            # SW.open(self.file_win.currentItem().text(path_clm))
+            SW.open(self.file_win.currentItem().text(path_clm))
         elif self.file_win1.currentItem():
             path_clm = self.file_win1.getHeaderCount(u"路径")
-            # SW.open(self.file_win1.currentItem().text(path_clm))
+            SW.open(self.file_win1.currentItem().text(path_clm))
         else:
             InfoWin(u"请选择文件")
 
@@ -432,10 +450,10 @@ class ShotWin(QtWidgets.QDialog):
         '''
         if self.file_win.currentItem():
             path_clm = self.file_win.getHeaderCount(u"路径")
-            # SW.reference(self.file_win.currentItem().text(path_clm))
+            SW.reference(self.file_win.currentItem().text(path_clm), removeNamespace=False)
         elif self.file_win1.currentItem():
             path_clm = self.file_win1.getHeaderCount(u"路径")
-            # SW.reference(self.file_win1.currentItem().text(path_clm))
+            SW.reference(self.file_win1.currentItem().text(path_clm), removeNamespace=False)
         else:
             InfoWin(u"请选择文件")
 
@@ -518,41 +536,38 @@ class SaveWidget(QtWidgets.QTabWidget):
                     self.clearLayout(item.layout())
 
     def next(self):
-        # kwarg = {
-        #     'file_path': '',
-        #     'file_des': '',
-        #     'des': ''
-        # }
-        # print self.tab1.getPath()
-        # try:
-        #     subwin = SubWin("asset", self.tab1.asset_win.folder_win.currentItem().text(1), "Submite")
-        #     # 子窗口不关闭无法操作父窗口
-        #     subwin.setWindowModality(QtCore.Qt.ApplicationModal)
-        #     subwin.exec_()
-        # except:
-        #     InfoWin(u"请选择相应的环节保存")
         try:
             kwagrs = {
-                'sequence': 'asset',
+                'type': 'asset',
+                'sequence': '',
                 'assetname': self.tab1.asset_win.folder_win.currentItem().text(0),
                 'step': self.tab1.asset_win.folder_win.currentItem().text(1),
-                'filepath': self.tab1.getPath()
+                'filepath': self.tab1.getPath()+"/work"
             }
             # pprint(kwagrs)
-            subwin = SubWin("asset", "Submite", **kwagrs)
+            subwin = SubWin("asset", kwagrs['step']+"Submite", **kwagrs)
             # 子窗口不关闭无法操作父窗口
             subwin.setWindowModality(QtCore.Qt.ApplicationModal)
             subwin.exec_()
+            self.close()
         except:
             InfoWin(u"请选择相应的环节保存")
 
     def next1(self):
-        print self.tab2.getPath()
         try:
-            subwin = SubWin("shot", self.tab2.shot_win.folder_win.currentItem().text(0), "Submite")
+            kwagrs = {
+                'type': 'shot',
+                'sequence': self.tab2.shot_win.folder_win.currentItem().parent().parent().text(0),
+                'shot': self.tab2.shot_win.folder_win.currentItem().parent().text(0),
+                'step': self.tab2.shot_win.folder_win.currentItem().text(0),
+                'filepath': self.tab2.getPath()+"/work"
+            }
+            # print kwagrs
+            subwin = SubWin("shot", kwagrs['step']+"Submite", **kwagrs)
             # 子窗口不关闭无法操作父窗口
             subwin.setWindowModality(QtCore.Qt.ApplicationModal)
             subwin.exec_()
+            self.close()
         except:
             InfoWin(u"请选择相应的环节保存")
 
@@ -565,37 +580,47 @@ class PublishWidget(SaveWidget):
 
     def next(self):
         try:
-            kwagrs = {
-                'sequence': 'asset',
-                'assetname': self.tab1.asset_win.folder_win.currentItem().text(0),
-                'step': self.tab1.asset_win.folder_win.currentItem().text(1),
-                'filepath': self.tab1.getPath()
-            }
-            # pprint(kwagrs)
-            subwin = SubWin("asset", "Publish", **kwagrs)
-            subwin.extend_des_lab.setVisible(False)
-            subwin.des_com.setVisible(False)
-            # 子窗口不关闭无法操作父窗口
-            subwin.setWindowModality(QtCore.Qt.ApplicationModal)
-            subwin.exec_()
+            import maya.cmds as cmds
+            if os.path.dirname(cmds.file(location=True, q=True)) == self.tab1.getPath():
+                kwagrs = {
+                    'type': 'asset',
+                    'sequence': '',
+                    'assetname': self.tab1.asset_win.folder_win.currentItem().text(0),
+                    'step': self.tab1.asset_win.folder_win.currentItem().text(1),
+                    'filepath': self.tab1.getPath() + "/approve"
+                }
+                # pprint(kwagrs)
+                subwin = SubWin("asset", kwagrs['step']+"Publish", **kwagrs)
+                subwin.extend_des_lab.setVisible(False)
+                subwin.des_com.setVisible(False)
+                # 子窗口不关闭无法操作父窗口
+                subwin.setWindowModality(QtCore.Qt.ApplicationModal)
+                subwin.exec_()
+            else:
+                InfoWin(u"请使用open打开")
         except:
             InfoWin(u"请选择相应的环节保存")
 
     def next1(self):
         try:
-            kwagrs = {
-                'sequence': self.tab2.shot_win.folder_win.topLevelItem(0).child(0).text(0),
-                'shot': self.tab2.shot_win.folder_win.currentItem().parent().text(0),
-                'step': self.tab2.shot_win.folder_win.currentItem().text(0),
-                'filepath': self.tab2.getPath()
-            }
-            # print kwagrs
-            subwin = SubWin("shot", "Publish", **kwagrs)
-            subwin.extend_des_lab.setVisible(False)
-            subwin.des_com.setVisible(False)
-            # 子窗口不关闭无法操作父窗口
-            subwin.setWindowModality(QtCore.Qt.ApplicationModal)
-            subwin.exec_()
+            import maya.cmds as cmds
+            if os.path.dirname(cmds.file(location=True, q=True)) == self.tab1.getPath():
+                kwagrs = {
+                    'type': 'shot',
+                    'sequence': self.tab2.shot_win.folder_win.currentItem().parent().parent().text(0),
+                    'shot': self.tab2.shot_win.folder_win.currentItem().parent().text(0),
+                    'step': self.tab2.shot_win.folder_win.currentItem().text(0),
+                    'filepath': self.tab2.getPath() + "/approve"
+                }
+                # print kwagrs
+                subwin = SubWin("shot", kwagrs['step']+"Publish", **kwagrs)
+                subwin.extend_des_lab.setVisible(False)
+                subwin.des_com.setVisible(False)
+                # 子窗口不关闭无法操作父窗口
+                subwin.setWindowModality(QtCore.Qt.ApplicationModal)
+                subwin.exec_()
+            else:
+                InfoWin(u"请使用open打开")
         except:
             InfoWin(u"请选择相应的环节保存")
 
@@ -603,6 +628,7 @@ class PublishWidget(SaveWidget):
 class SubWin(QtWidgets.QDialog):
     def __init__(self, AorS, state='',
                  filepath='',
+                 type = '',
                  sequence='',
                  assetname='',
                  shot='',
@@ -621,6 +647,7 @@ class SubWin(QtWidgets.QDialog):
         self.setWindowTitle(u"提交")
         self.a_or_s = AorS
         self.filepath = filepath
+        self.type = type
         self.sequence = sequence
         self.shot = shot
         self.assetname = assetname
@@ -683,6 +710,7 @@ class SubWin(QtWidgets.QDialog):
         }
         # print kwarg
         var_key = {
+            'type': self.type,
             'sequence': self.sequence,
             'file_name': CONFIGDATA.file_name(self.a_or_s, self.step),
             'asset_name': self.assetname,
@@ -691,15 +719,21 @@ class SubWin(QtWidgets.QDialog):
             'describtion': self.des_win.toPlainText(),
             'describtion_item': self.des_com.currentText()
         }
-        # pprint(var_key)
+        pprint(var_key)
         file_name = action.get_variable(**var_key)
-        # print file_name
-        print action.getLatestVersion(self.filepath, file_name)['current_file']
+        print file_name
+        result_name = action.getLatestVersion(self.filepath, file_name)['current_file']
+        tip = SW.saveAs(os.path.join(self.filepath, result_name))
+        
         cache = {}
         cache["description"] = self.des_win.toPlainText()
 
+        if tip:
+            InfoWin(u"已成功保存文件")
 
         self.close()
+
+        return True
 
 
 class CreateAssetWin(QtWidgets.QDialog):

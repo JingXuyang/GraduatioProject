@@ -19,6 +19,7 @@ CachePath = "C:/Users/" + os.getenv('username') + "/.gdpj"
 
 
 def get_variable(file_name,
+                 type='',
                  sequence='',
                  asset_name='',
                  step='',
@@ -38,6 +39,7 @@ def get_variable(file_name,
 
     # print str
     kwarg = {
+        'type': type,
         'sequence': sequence,
         'file_name': file_name,
         'asset_name': asset_name,
@@ -58,13 +60,15 @@ def get_variable(file_name,
             a = ReadCofig()
             # eval() 把字符串改为对应的的变量名，例如：eval("a." + i) <=> ReadCofig.i
             ins = eval("a." + i)
-            if sequence == "asset":
+            if type == "asset":
                 if i == "describtion_item":
                     result.append(kwarg[i])
                 else:
                     result.append(ins("asset", step))
             else:
                 if i == "describtion_item":
+                    result.append(kwarg[i])
+                elif i == "shot":
                     result.append(kwarg[i])
                 else:
                     result.append(ins("shot", step))

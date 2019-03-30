@@ -94,7 +94,7 @@ class PushButton(QtWidgets.QPushButton):
         qss.load_style(self)
 
         # button style
-        qss.button_style(self, "Mint")
+        qss.button_style(self, "MediumGray")
 
         self.setText(name)
         self.setMinimumWidth(45)

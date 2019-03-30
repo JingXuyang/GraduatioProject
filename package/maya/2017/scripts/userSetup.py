@@ -12,29 +12,30 @@ sys.path.append(os.path.dirname(os.path.realpath('__file__'))+"\\widget")
 print 'Building Pipeline Toolkit...'
 
 openWin = '''
-# import plwin
-# reload(plwin)
-# plwin.open()
-
 import sys
 sys.path.append("D:\GraduatioProject\widget")
 import _ui
+reload(_ui)
 win = _ui.OpenWidget()
 win.show()
-win.exec_()
-
 '''
 
 saveWin = '''
-import plwin
-reload(plwin)
-plwin.save()
+import sys
+sys.path.append("D:\GraduatioProject\widget")
+import _ui
+reload(_ui)
+win = _ui.SaveWidget()
+win.show()
 '''
 
 publishWin = '''
-import plwin
-reload(plwin)
-plwin.publish()
+import sys
+sys.path.append("D:\GraduatioProject\widget")
+import _ui
+reload(_ui)
+win = _ui.PublishWidget()
+win.show()
 '''
 
 

@@ -10,6 +10,7 @@ import sys
 sys.path.append(os.path.dirname(os.path.dirname(os.path.realpath('__file__'))))
 
 import _ui
+reload(_ui)
 
 def open():
     '''
@@ -40,12 +41,12 @@ def submite():
 
 
 app = QtWidgets.QApplication(sys.argv)
-# # main = Window()
-# # main = _ui.AssetDataWin()
+# # # main = Window()
+# # # main = _ui.AssetDataWin()
 main = _ui.OpenWidget()
-# # main = _ui.SaveWidget()
-# # main = _ui.PublishWidget()
-# # main = _UI.SubWin("shot", "Animation")
+# # # main = _ui.SaveWidget()
+# # # main = _ui.PublishWidget()
+# # # main = _UI.SubWin("shot", "Animation")
 main.show()
 app.exec_()
 
