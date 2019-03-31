@@ -553,7 +553,8 @@ class SaveWidget(QtWidgets.QTabWidget):
                 'sequence': '',
                 'assetname': self.tab1.asset_win.folder_win.currentItem().text(0),
                 'step': self.tab1.asset_win.folder_win.currentItem().text(1),
-                'filepath': self.tab1.getPath()+"/work"
+                'filepath': self.tab1.getPath()+"/work",
+                'do': 'submite'
             }
             # pprint(kwagrs)
             subwin = SubWin("asset", kwagrs['step']+"Submite", **kwagrs)
@@ -571,7 +572,8 @@ class SaveWidget(QtWidgets.QTabWidget):
                 'sequence': self.tab2.shot_win.folder_win.currentItem().parent().parent().text(0),
                 'shot': self.tab2.shot_win.folder_win.currentItem().parent().text(0),
                 'step': self.tab2.shot_win.folder_win.currentItem().text(0),
-                'filepath': self.tab2.getPath()+"/work"
+                'filepath': self.tab2.getPath()+"/work",
+                'do': 'submite'
             }
             # print kwagrs
             subwin = SubWin("shot", kwagrs['step']+"Submite", **kwagrs)
@@ -600,7 +602,8 @@ class PublishWidget(SaveWidget):
                     'sequence': '',
                     'assetname': self.tab1.asset_win.folder_win.currentItem().text(0),
                     'step': self.tab1.asset_win.folder_win.currentItem().text(1),
-                    'filepath': self.tab1.getPath() + "/approve"
+                    'filepath': self.tab1.getPath() + "/approve",
+                    'do': 'publish'
                 }
                 # pprint(kwagrs)
                 subwin = SubWin("asset", kwagrs['step']+"Publish", **kwagrs)
@@ -623,7 +626,8 @@ class PublishWidget(SaveWidget):
                     'sequence': self.tab2.shot_win.folder_win.currentItem().parent().parent().text(0),
                     'shot': self.tab2.shot_win.folder_win.currentItem().parent().text(0),
                     'step': self.tab2.shot_win.folder_win.currentItem().text(0),
-                    'filepath': self.tab2.getPath() + "/approve"
+                    'filepath': self.tab2.getPath() + "/approve",
+                    'do': 'publish'
                 }
                 # print kwagrs
                 subwin = SubWin("shot", kwagrs['step']+"Publish", **kwagrs)
@@ -646,6 +650,7 @@ class SubWin(QtWidgets.QDialog):
                  assetname='',
                  shot='',
                  step='',
+                 do='',
                  parent=None
                  ):
         '''
@@ -666,6 +671,7 @@ class SubWin(QtWidgets.QDialog):
         self.assetname = assetname
         self.step = step
         self.state = state
+        self.do = do
 
         self._ui()
 
@@ -737,14 +743,23 @@ class SubWin(QtWidgets.QDialog):
         # print file_name
 
         # ---获取正确的命名
-        result_name = action.getLatestVersion(self.filepath, file_name)['current_file']
+        files = os.listdir(self.filepath)
+        result_name = action.getLatestVersion(files, file_name)['current_file']
 
-        # ---保存文件并发布
+        # ---保存文件并提交，发布文件
         currentFile = SW.currentFile()
-        currentFileBase = SW.currentFileBasename()
-        pub_path = os.path.join(self.filepath, currentFileBase)
+        currentFileBase = SW.currentFileName()
         tip = SW.save(force=True)
-        OS.copyFile(currentFile, pub_path)
+
+        if self.do == 'publish':
+            if self.step == 'Texture':
+                pass
+            else:
+                pub_path = os.path.join(self.filepath, currentFileBase)
+                OS.copyFile(currentFile, pub_path)
+        elif self.do == 'submite':
+            temp = os.path.join(self.filepath, result_name)
+            SW.saveAs(temp, force=True)
 
         # ---写入数据库
         temp = {}

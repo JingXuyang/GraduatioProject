@@ -69,6 +69,9 @@ class Maya():
     def currentFile(self):
         return self._cmds.file(location=True, q=True)
 
+    def currentFileName(self):
+        return os.path.basename(self._cmds.file(location=True, q=True))
+
     def currentFileBasename(self):
         return os.path.basename(self._cmds.file(location=True, q=True)).split(".")[0]
 
