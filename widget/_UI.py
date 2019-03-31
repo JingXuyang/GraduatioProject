@@ -25,6 +25,8 @@ ASSETROOT = ["Character", "Prop", "Set"]
 SEQUENCEROOT = ["Sequences"]
 
 OS = action.OS()
+CACHE = action.CacheInfo()
+CACHEPATH = os.path.dirname(os.path.realpath('__file__'))+"/data/database".replace("\\", "/")
 CONFIGDATA = action.ReadCofig()
 file_mes = action.FileMessage()
 ProjectPath = CONFIGDATA.get_global()['project_path']
@@ -251,9 +253,11 @@ class AssetWin(QtWidgets.QDialog):
         if self.file_win.currentItem():
             path_clm = self.file_win.getHeaderCount(u"路径")
             SW.open(self.file_win.currentItem().text(path_clm), True)
+            self.close()
         elif self.file_win1.currentItem():
             path_clm = self.file_win1.getHeaderCount(u"路径")
             SW.open(self.file_win1.currentItem().text(path_clm), True)
+            self.close()
         else:
             InfoWin(u"请选择文件")
 
@@ -265,9 +269,11 @@ class AssetWin(QtWidgets.QDialog):
         if self.file_win.currentItem():
             path_clm = self.file_win.getHeaderCount(u"路径")
             SW.import_(self.file_win.currentItem().text(path_clm))
+            self.close()
         elif self.file_win1.currentItem():
             path_clm = self.file_win1.getHeaderCount(u"路径")
             SW.import_(self.file_win1.currentItem().text(path_clm))
+            self.close()
         else:
             InfoWin(u"请选择文件")
 
@@ -279,9 +285,11 @@ class AssetWin(QtWidgets.QDialog):
         if self.file_win.currentItem():
             path_clm = self.file_win.getHeaderCount(u"路径")
             SW.reference(self.file_win.currentItem().text(path_clm), removeNamespace=False)
+            self.close()
         elif self.file_win1.currentItem():
             path_clm = self.file_win1.getHeaderCount(u"路径")
             SW.reference(self.file_win1.currentItem().text(path_clm), removeNamespace=False)
+            self.close()
         else:
             InfoWin(u"请选择文件")
 
@@ -417,15 +425,14 @@ class ShotWin(QtWidgets.QDialog):
         打开选中的文件
         :return:
         '''
-        print self.getPath()
         if self.file_win.currentItem():
             path_clm = self.file_win.getHeaderCount(u"路径")
-            # print self.file_win.currentItem().text(path_clm)
             SW.open(self.file_win.currentItem().text(path_clm), True)
+            self.close()
         elif self.file_win1.currentItem():
-
             path_clm = self.file_win1.getHeaderCount(u"路径")
             SW.open(self.file_win1.currentItem().text(path_clm), True)
+            self.close()
         else:
             InfoWin(u"请选择文件")
 
@@ -437,9 +444,11 @@ class ShotWin(QtWidgets.QDialog):
         if self.file_win.currentItem():
             path_clm = self.file_win.getHeaderCount(u"路径")
             SW.open(self.file_win.currentItem().text(path_clm))
+            self.close()
         elif self.file_win1.currentItem():
             path_clm = self.file_win1.getHeaderCount(u"路径")
             SW.open(self.file_win1.currentItem().text(path_clm))
+            self.close()
         else:
             InfoWin(u"请选择文件")
 
@@ -451,9 +460,11 @@ class ShotWin(QtWidgets.QDialog):
         if self.file_win.currentItem():
             path_clm = self.file_win.getHeaderCount(u"路径")
             SW.reference(self.file_win.currentItem().text(path_clm), removeNamespace=False)
+            self.close()
         elif self.file_win1.currentItem():
             path_clm = self.file_win1.getHeaderCount(u"路径")
             SW.reference(self.file_win1.currentItem().text(path_clm), removeNamespace=False)
+            self.close()
         else:
             InfoWin(u"请选择文件")
 
@@ -581,7 +592,9 @@ class PublishWidget(SaveWidget):
     def next(self):
         try:
             import maya.cmds as cmds
-            if os.path.dirname(cmds.file(location=True, q=True)) == self.tab1.getPath():
+            # print os.path.dirname(cmds.file(location=True, q=True))
+            # print self.tab1.getPath()+"/work"
+            if os.path.dirname(cmds.file(location=True, q=True)) == self.tab1.getPath()+"/work":
                 kwagrs = {
                     'type': 'asset',
                     'sequence': '',
@@ -597,14 +610,14 @@ class PublishWidget(SaveWidget):
                 subwin.setWindowModality(QtCore.Qt.ApplicationModal)
                 subwin.exec_()
             else:
-                InfoWin(u"请使用open打开")
+                InfoWin(u"请使用open打开work文件")
         except:
             InfoWin(u"请选择相应的环节保存")
 
     def next1(self):
         try:
             import maya.cmds as cmds
-            if os.path.dirname(cmds.file(location=True, q=True)) == self.tab1.getPath():
+            if os.path.dirname(cmds.file(location=True, q=True)) == self.tab2.getPath()+"/work":
                 kwagrs = {
                     'type': 'shot',
                     'sequence': self.tab2.shot_win.folder_win.currentItem().parent().parent().text(0),
@@ -620,7 +633,7 @@ class PublishWidget(SaveWidget):
                 subwin.setWindowModality(QtCore.Qt.ApplicationModal)
                 subwin.exec_()
             else:
-                InfoWin(u"请使用open打开")
+                InfoWin(u"请使用open打开work文件")
         except:
             InfoWin(u"请选择相应的环节保存")
 
@@ -719,16 +732,30 @@ class SubWin(QtWidgets.QDialog):
             'describtion': self.des_win.toPlainText(),
             'describtion_item': self.des_com.currentText()
         }
-        pprint(var_key)
+        # pprint(var_key)
         file_name = action.get_variable(**var_key)
-        print file_name
+        # print file_name
+
+        # ---获取正确的命名
         result_name = action.getLatestVersion(self.filepath, file_name)['current_file']
-        tip = SW.saveAs(os.path.join(self.filepath, result_name))
+
+        # ---保存文件并发布
+        currentFile = SW.currentFile()
+        currentFileBase = SW.currentFileBasename()
+        pub_path = os.path.join(self.filepath, currentFileBase)
+        tip = SW.save(force=True)
+        OS.copyFile(currentFile, pub_path)
+
+        # ---写入数据库
+        temp = {}
+        temp['app_description'] = self.des_win.toPlainText()
+        temp['artist'] = OS.get_user()
+        write_data = CACHE.write_json(temp, CACHEPATH, currentFileBase)
         
         cache = {}
         cache["description"] = self.des_win.toPlainText()
 
-        if tip:
+        if tip and write_data:
             InfoWin(u"已成功保存文件")
 
         self.close()

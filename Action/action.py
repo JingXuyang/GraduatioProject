@@ -7,6 +7,7 @@ import json
 import yaml
 import re
 import shutil
+import getpass
 import datetime
 
 # from Data import analysis
@@ -236,6 +237,13 @@ class OS(object):
             else:
                 return False
 
+    def get_user(self):
+        '''
+
+        :return: 返回当前系统的用户名
+        '''
+        return getpass.getuser()
+
     def get_folders(self, path):
         '''
 
@@ -361,14 +369,14 @@ class CacheInfo(object):
 
     def write_json(self, info, path, filename):
         '''
-        :param info: 需要写入的文件信息，写入到
+        :param info: 需要写入的文件信息
         :param filename: json文件名
         :return: 返回文件信息
         '''
         text = json.dumps(info, indent=4)
         # jsonPath = "{0}/{1}.json".format(CachePath, filename)
         jsonPath = "{0}/{1}.json".format(path, filename)
-        f = open(jsonPath, "w")
+        f = open(jsonPath, "a")
         f.write(text)
         f.close()
 

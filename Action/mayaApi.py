@@ -65,7 +65,13 @@ class Maya():
     def setResolution(self, width, height):
         self._cmds.setAttr('defaultResolution.width', width)
         self._cmds.setAttr('defaultResolution.height', height)
-    
+
+    def currentFile(self):
+        return self._cmds.file(location=True, q=True)
+
+    def currentFileBasename(self):
+        return os.path.basename(self._cmds.file(location=True, q=True)).split(".")[0]
+
     def currentFrame(self):
         return self._cmds.currentTime(query=True)
     
