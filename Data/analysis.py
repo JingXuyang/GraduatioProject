@@ -53,7 +53,6 @@ def get_variable(str):
 
 
 
-
 class ReadCofig(object):
 
     def __init__(self):

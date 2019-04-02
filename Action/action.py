@@ -376,7 +376,7 @@ class CacheInfo(object):
         text = json.dumps(info, indent=4)
         # jsonPath = "{0}/{1}.json".format(CachePath, filename)
         jsonPath = "{0}/{1}.json".format(path, filename)
-        f = open(jsonPath, "a")
+        f = open(jsonPath, "w")
         f.write(text)
         f.close()
 
