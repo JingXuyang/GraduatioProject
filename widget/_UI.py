@@ -136,6 +136,8 @@ class AssetWin(QtWidgets.QDialog):
     def __init__(self, parent=None):
         super(AssetWin, self).__init__(parent)
 
+        self.par = parent
+
         self._ui()
 
     def _ui(self):
@@ -253,11 +255,11 @@ class AssetWin(QtWidgets.QDialog):
         if self.file_win.currentItem():
             path_clm = self.file_win.getHeaderCount(u"路径")
             SW.open(self.file_win.currentItem().text(path_clm), True)
-            self.close()
+            self.par.close()
         elif self.file_win1.currentItem():
             path_clm = self.file_win1.getHeaderCount(u"路径")
             SW.open(self.file_win1.currentItem().text(path_clm), True)
-            self.close()
+            self.par.close()
         else:
             InfoWin(u"请选择文件")
 
@@ -269,11 +271,11 @@ class AssetWin(QtWidgets.QDialog):
         if self.file_win.currentItem():
             path_clm = self.file_win.getHeaderCount(u"路径")
             SW.import_(self.file_win.currentItem().text(path_clm))
-            self.close()
+            self.par.close()
         elif self.file_win1.currentItem():
             path_clm = self.file_win1.getHeaderCount(u"路径")
             SW.import_(self.file_win1.currentItem().text(path_clm))
-            self.close()
+            self.par.close()
         else:
             InfoWin(u"请选择文件")
 
@@ -285,11 +287,11 @@ class AssetWin(QtWidgets.QDialog):
         if self.file_win.currentItem():
             path_clm = self.file_win.getHeaderCount(u"路径")
             SW.reference(self.file_win.currentItem().text(path_clm), removeNamespace=False)
-            self.close()
+            self.par.close()
         elif self.file_win1.currentItem():
             path_clm = self.file_win1.getHeaderCount(u"路径")
             SW.reference(self.file_win1.currentItem().text(path_clm), removeNamespace=False)
-            self.close()
+            self.par.close()
         else:
             InfoWin(u"请选择文件")
 
@@ -297,11 +299,11 @@ class AssetWin(QtWidgets.QDialog):
 class ShotWin(QtWidgets.QDialog):
     def __init__(self, parent=None):
         super(ShotWin, self).__init__(parent)
+        self.parent = parent
 
         self._ui()
 
     def _ui(self):
-
         self.shot_win = BasicWin()
         self.folder_win = self.shot_win.folder_win
         self.file_win = self.shot_win.file_win
@@ -481,10 +483,9 @@ class OpenWidget(QtWidgets.QTabWidget):
         self._ui()
 
     def _ui(self):
-
         # ------------------主界面 -------------------
-        self.tab1 = AssetWin()
-        self.tab2 = ShotWin()
+        self.tab1 = AssetWin(self)
+        self.tab2 = ShotWin(self)
 
         self.addTab(self.tab1, u"资产")
         self.addTab(self.tab2, u"镜头")
@@ -499,7 +500,6 @@ class SaveWidget(QtWidgets.QTabWidget):
         self._ui()
 
     def _ui(self):
-
         # ------------------主界面 -------------------
         self.tab1 = AssetWin()
         self.clearLayout(self.tab1.asset_win.mid)
@@ -612,6 +612,7 @@ class PublishWidget(SaveWidget):
                 # 子窗口不关闭无法操作父窗口
                 subwin.setWindowModality(QtCore.Qt.ApplicationModal)
                 subwin.exec_()
+                self.close()
             else:
                 InfoWin(u"请使用open打开work文件")
         except:
@@ -636,6 +637,7 @@ class PublishWidget(SaveWidget):
                 # 子窗口不关闭无法操作父窗口
                 subwin.setWindowModality(QtCore.Qt.ApplicationModal)
                 subwin.exec_()
+                self.close()
             else:
                 InfoWin(u"请使用open打开work文件")
         except:
@@ -718,16 +720,6 @@ class SubWin(QtWidgets.QDialog):
     def submite(self):
         # print self.des_win.toPlainText()
         # print self.des_com.currentText()
-
-        kwarg = {
-            'file_path': self.filepath,
-            'file_name': CONFIGDATA.file_name(self.a_or_s, self.step),
-            'sequence': self.sequence,
-            'asset_name': self.assetname,
-            'step': self.step,
-            'describtion': self.des_win.toPlainText()
-        }
-        # print kwarg
         var_key = {
             'type': self.type,
             'sequence': self.sequence,
@@ -746,29 +738,49 @@ class SubWin(QtWidgets.QDialog):
         files = os.listdir(self.filepath)
         result_name = action.getLatestVersion(files, file_name)['current_file']
 
-        # ---保存文件并提交，发布文件
+        # ---保存文件
         currentFile = SW.currentFile()
-        currentFileBase = SW.currentFileName()
+        currentFileBase = SW.currentFileBasename()
         tip = SW.save(force=True)
-
+        # 当publish文件时，如果是材质环节，则导出带有材质的ma文件.
+        # 否则就复制文件到approve文件夹下边
         if self.do == 'publish':
             if self.step == 'Texture':
                 pass
             else:
                 pub_path = os.path.join(self.filepath, currentFileBase)
                 OS.copyFile(currentFile, pub_path)
+
+                # ---写入数据库
+                json_path = CACHEPATH+"/"+currentFileBase.split(".")[0]+".json"
+                print json_path
+                if os.path.exists(json_path):
+                    data = CACHE.read_json(json_path)
+                    data['pub_description'] = self.des_win.toPlainText()
+                    print data
+                    write_data = CACHE.write_json(data, CACHEPATH, currentFileBase.split(".")[0])
+                else:
+                    temp = {}
+                    temp['pub_description'] = self.des_win.toPlainText()
+                    temp['artist'] = OS.get_user()
+                    write_data = CACHE.write_json(temp, CACHEPATH, result_name.split(".")[0])
+
+        # 当submite文件时，保存文件到work文件下
         elif self.do == 'submite':
             temp = os.path.join(self.filepath, result_name)
             SW.saveAs(temp, force=True)
 
-        # ---写入数据库
-        temp = {}
-        temp['app_description'] = self.des_win.toPlainText()
-        temp['artist'] = OS.get_user()
-        write_data = CACHE.write_json(temp, CACHEPATH, currentFileBase)
-        
-        cache = {}
-        cache["description"] = self.des_win.toPlainText()
+            # ---写入数据库
+            json_path = (os.path.join(CACHEPATH, result_name.split(".")[0]))
+            if os.path.exists(json_path):
+                data = CACHE.read_json(json_path)
+                data['sub_description'] = self.des_win.toPlainText()
+                CACHE.write_json(data, CACHEPATH, result_name.split(".")[0])
+            else:
+                temp = {}
+                temp['sub_description'] = self.des_win.toPlainText()
+                temp['artist'] = OS.get_user()
+                write_data = CACHE.write_json(temp, CACHEPATH, result_name.split(".")[0])
 
         if tip and write_data:
             InfoWin(u"已成功保存文件")
